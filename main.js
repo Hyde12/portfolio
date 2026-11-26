@@ -81,8 +81,7 @@ const sharedContent = {
   projects: [contentBank?.querySelector('#work')],
   profile: [contentBank?.querySelector('.about-copy')],
   tools: [contentBank?.querySelector('.toolkit')],
-  activity: [contentBank?.querySelector('.github-preview')],
-  contact: [contentBank?.querySelector('.contact-card'), contentBank?.querySelector('.footer')]
+  activity: [contentBank?.querySelector('.github-preview')]
 };
 
 function mountSharedContent() {
@@ -101,6 +100,7 @@ const desktopWindowState = Object.fromEntries(
 function renderDesktop() {
   if (!desktopView) return;
   desktopView.dataset.space = desktopSpace;
+  desktopView.dataset.focusWindow = focusedWindow;
   const windows = [...desktopView.querySelectorAll('.desktop-window')];
   windows.forEach((windowNode, index) => {
     const id = windowNode.dataset.window;
@@ -110,6 +110,16 @@ function renderDesktop() {
     windowNode.classList.toggle('focused', id === focusedWindow && visible);
     windowNode.style.zIndex = String(id === focusedWindow ? windows.length + 1 : index + 1);
   });
+
+  if (mobileLayoutQuery.matches) {
+    const activeWindow = windows.find((windowNode) => windowNode.dataset.window === focusedWindow);
+    activeWindow?.querySelectorAll('.reveal').forEach((item) => {
+      item.classList.add('is-visible');
+      item.style.removeProperty('opacity');
+      item.style.removeProperty('transform');
+      item.style.visibility = 'visible';
+    });
+  }
 
   const taskbar = desktopView.querySelector('#desktop-taskbar');
   const tasks = windows.filter((windowNode) => windowNode.dataset.space === desktopSpace && desktopWindowState[windowNode.dataset.window]?.open);
@@ -134,6 +144,32 @@ function renderDesktop() {
   desktopView.querySelectorAll('[data-open-window]').forEach((button) => {
     button.setAttribute('aria-pressed', String(button.dataset.openWindow === focusedWindow));
   });
+}
+
+const mobileWindowDock = desktopView?.querySelector('.desktop-mobile-dock');
+const desktopRail = desktopView?.querySelector('.desktop-rail');
+const mobileRailControls = desktopRail?.querySelector('.rail-controls');
+const desktopControlsReturnPoint = mobileRailControls?.nextSibling || null;
+const mobileLayoutQuery = window.matchMedia('(max-width: 700px)');
+
+function placeSettingsForViewport() {
+  if (!mobileRailControls || !desktopRail || !mobileWindowDock) return;
+  if (mobileLayoutQuery.matches) {
+    mobileWindowDock.append(mobileRailControls);
+    return;
+  }
+  desktopRail.insertBefore(mobileRailControls, desktopControlsReturnPoint?.parentNode === desktopRail ? desktopControlsReturnPoint : null);
+}
+
+placeSettingsForViewport();
+const handleMobileLayoutChange = () => {
+  placeSettingsForViewport();
+  renderDesktop();
+};
+if (typeof mobileLayoutQuery.addEventListener === 'function') {
+  mobileLayoutQuery.addEventListener('change', handleMobileLayoutChange);
+} else if (typeof mobileLayoutQuery.addListener === 'function') {
+  mobileLayoutQuery.addListener(handleMobileLayoutChange);
 }
 
 function switchDesktopSpace(space) {
@@ -544,7 +580,7 @@ document.addEventListener('click', (event) => {
 
 const rotatingText = document.querySelector('.rotating-text');
 if (rotatingText && !reducedMotion) {
-  const phrases = ['build software', 'work across teams', 'build with a team'];
+  const phrases = ['build software', 'solve practical problems', 'keep learning'];
   let phraseIndex = 0;
   rotatingText.textContent = '';
   const typeNext = (delay = 220) => monitorTimeout(() => {
@@ -699,7 +735,7 @@ function runTerminalCommand(rawCommand, printPrompt = true) {
   } else if (normalized === 'help') {
     output = 'help                 show available commands\nls [directory]       list files and directories\npwd                  print current directory\ncd <directory>       change directory\ncat <file>           read a project or portfolio file\nwhoami               about Hyde\nclear                clear the screen';
   } else if (normalized === 'whoami') {
-    output = 'Zil Hyde Buenaventura\nStudent developer · Philippines\nI build software across different areas, with both individual and team projects.';
+    output = 'Zil Hyde Buenaventura\nStudent developer · Philippines\nI build across different areas, from Rust tools to collaborative projects like Lakad.';
   } else if ((normalized === 'cargo' && args[0] === 'run') || (normalized === 'npm' && args[0] === 'run') || (normalized === 'python' && args[0] === 'app.py')) {
     const option = projectForFolder(workingDirectory.at(-1));
     if (!option) output = 'Choose a project directory first: cd projects/<directory>';
@@ -737,7 +773,7 @@ function runTerminalCommand(rawCommand, printPrompt = true) {
     const option = projectForFolder(folder);
     if (option && (filename.endsWith('README.md') || filename === 'README.md')) output = projectReadme(option);
     else if (!workingDirectory.length && filename === 'README.md') output = 'Welcome to Hyde’s portfolio.\n\nBrowse projects with ls projects, then cd into one to read its README.md.\nTry: cd projects/lakad && cat README.md';
-    else if (!workingDirectory.length && filename === 'about.txt') output = 'Zil Hyde Buenaventura\nStudent developer in the Philippines.\nI work across personal projects and team builds, using different tools to solve practical problems.';
+    else if (!workingDirectory.length && filename === 'about.txt') output = 'Zil Hyde Buenaventura\nStudent developer in the Philippines.\nMy projects range from Rust tools to collaborative work like Lakad.';
     else if (!workingDirectory.length && filename === 'contact.txt') output = 'Email: zillyhyde.games@gmail.com\nGitHub: github.com/Hyde12';
     else output = `cat: ${argument}: no such file`;
   } else {
