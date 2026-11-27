@@ -170,6 +170,9 @@ body{background-image:radial-gradient(ellipse at 50% -18%,#50344826,transparent 
 .chart-y-labels text{fill:#aaa3b2;font:10px var(--mono);text-anchor:end}
 .activity-graph{height:144px}
 .activity-chart{background:linear-gradient(135deg,#101014,#0c0c10)}
+.activity-chart[data-state="loading"] .activity-graph{opacity:.28}
+.activity-chart[data-state="unavailable"] .activity-graph{display:none}
+.activity-chart[data-state="unavailable"] .activity-note{display:grid;min-height:138px;place-items:center;padding:12px}
 .activity-points circle{stroke:#0c0c10}
 .mini-terminal-heading span:first-child::before{content:"> ";color:var(--orange)}
 .education-terminal,.github-preview,.toolkit{box-shadow:0 10px 32px #0002}
@@ -206,7 +209,6 @@ body.intro-open{overflow:hidden}
 .boot-body::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(0deg,#ffffff04 0 1px,transparent 1px 4px),radial-gradient(400px circle at 84% 16%,#a977c814,transparent 72%)}
 .boot-body>*{position:relative;z-index:1}
 .boot-mark{float:right;margin:1px 4px 16px 24px;color:#c6a3e0;font:500 clamp(36px,7vw,58px)/1 var(--mono);letter-spacing:-.12em;text-shadow:0 0 30px #a977c950;transform:rotateY(-18deg) rotateX(7deg);animation:boot-float 4s ease-in-out infinite}
-.boot-mark span{color:var(--orange);animation:blink .9s step-end infinite}
 .boot-overline{margin:0 0 7px;color:#a9d6ae;font:8px var(--mono);letter-spacing:.13em}
 .boot-body h1{max-width:450px;margin:0;color:#f1edf5;font:500 clamp(25px,5vw,38px)/1.2 var(--mono);letter-spacing:-.07em}
 .boot-body>p:not(.boot-overline){max-width:450px;margin:12px 0 22px;color:#aaa5b1;font-size:12px;line-height:1.8}
@@ -214,7 +216,6 @@ body.intro-open{overflow:hidden}
 .boot-log p{margin:0}
 .boot-log p span{color:#97cf9d}
 .boot-log p:last-child span:first-child{color:var(--orange)}
-.boot-caret{display:inline-block;margin-left:5px;color:var(--orange);animation:blink .9s step-end infinite}
 .boot-actions{display:flex;align-items:center;gap:15px;margin-top:18px}
 .boot-actions>span{color:#77717f;font:8px var(--mono)}
 .boot-actions kbd{padding:3px 5px;border:1px solid #3c3642;background:#18161d;color:#c2bbc9;font:8px var(--mono)}
@@ -600,13 +601,16 @@ html[data-theme="light"] .desktop-dock{
 html[data-theme="light"] .desktop-workspace{
   border-color:#d8d2c9;
   background:#f3f0eb;
-  color:#625d65;
+  color:#514a55;
 }
+html[data-theme="light"] .desktop-workspace span{color:#59535d}
 html[data-theme="light"] .desktop-workspace:hover,
 html[data-theme="light"] .desktop-workspace[aria-pressed="true"]{
   background:#fffefa;
-  color:#28252d;
+  color:#28232d;
 }
+html[data-theme="light"] .desktop-workspace:hover span,
+html[data-theme="light"] .desktop-workspace[aria-pressed="true"] span{color:#28232d}
 html[data-theme="light"] .desktop-workspace[aria-pressed="true"]{box-shadow:inset 0 -2px var(--orange)}
 html[data-theme="light"] .desktop-key-hint,
 html[data-theme="light"] .desktop-clock{color:#716b72}
@@ -713,7 +717,7 @@ html[data-theme="light"] .desktop-mobile-dock .rail-controls .theme-toggle,
 html[data-theme="light"] .desktop-mobile-dock .rail-controls .replay-intro{border-color:#d2ccc4;background:#fffefa;color:#514b55}
 
 /* The light theme is warm across the whole interface, including shell output. */
-html[data-theme="light"] .desktop-canvas{background-color:#ece8e0;background-image:radial-gradient(#988d7d30 .7px,transparent .7px);box-shadow:0 0 0 2px #bdb5aa,0 0 0 8px #ded9d0,0 0 0 10px #bdb5aa,0 24px 54px #50463938,inset 0 0 26px #54483a16}
+html[data-theme="light"] .desktop-canvas{border-color:#c8bfb3;background-color:#ece8e0;background-image:radial-gradient(#988d7d30 .7px,transparent .7px);box-shadow:0 0 0 2px #b8aea1,0 0 0 8px #e1d9cd,0 0 0 10px #b9aea1,0 24px 54px #50463924,inset 0 0 26px #54483a0c}
 html[data-theme="light"] .desktop-canvas::before{background:repeating-linear-gradient(to bottom,#51453708 0 1px,#ffffff13 1px 4px);opacity:.55}
 html[data-theme="light"] .desktop-canvas::after{background:radial-gradient(ellipse at center,transparent 68%,#6d5f4a12 100%),radial-gradient(ellipse 72% 18% at 48% 1%,#ffffff40,transparent 82%),linear-gradient(90deg,#b85d2d08,transparent 14%,transparent 86%,#70559a08);box-shadow:inset 0 0 0 1px #ffffff70,inset 0 0 38px 5px #54483a12}
 html[data-theme="light"] .window-terminal{border-color:#d2ccc4;background:#f5f1e9;color:#29272e}
@@ -822,6 +826,41 @@ html[data-theme="light"] .byte-particle.is-screen{color:#174e30;text-shadow:0 0 
   .window-contact .contact-email{width:100%;min-height:56px}
   .window-contact .contact-status{margin-top:auto}
 }
+
+.desktop-canvas[data-layout="focus"] .desktop-window:not(.focused){display:none}
+.desktop-canvas[data-layout="focus"] .desktop-window.focused{grid-column:1/13!important;grid-row:1/11!important;align-self:stretch}
+.desktop-window:focus{outline:2px solid var(--orange);outline-offset:2px}
+.shortcut-search{display:inline-flex;align-items:center;gap:6px;flex:none;min-height:27px;padding:3px 7px;border:1px solid #45404c;border-radius:3px;background:#17141a;color:#c8c2d0;font:7px var(--mono);letter-spacing:.05em;cursor:pointer}
+.shortcut-search:hover,.shortcut-search:focus-visible{border-color:var(--orange);color:#fff}
+.shortcut-search kbd{color:var(--orange);font:inherit}
+@media(min-width:701px){.shortcut-search{display:none}}
+.window-launcher{position:absolute;top:50%;left:50%;z-index:24;width:min(460px,calc(100% - 30px));max-height:calc(100% - 36px);overflow:auto;transform:translate(-50%,-50%);border:1px solid #55445f;border-radius:7px;background:#17141bf5;color:#e8e3ed;box-shadow:0 22px 70px #000b,0 0 0 1px #ffffff10;font-family:var(--mono)}
+.window-launcher[hidden]{display:none!important}
+.launcher-heading{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;border-bottom:1px solid #37313d;color:#bb9bd0;font-size:8px;letter-spacing:.1em}
+.launcher-heading button{width:23px;height:23px;border:1px solid #49414f;background:#211d26;color:#b9b2c1;font:15px var(--mono);cursor:pointer}
+.launcher-search-wrap{display:flex;align-items:center;gap:9px;margin:10px;padding:8px 10px;border:1px solid #51465a;background:#100f13;color:var(--orange)}
+.launcher-search-wrap input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#f1edf5;font:10px var(--mono)}
+.launcher-search-wrap input::placeholder{color:#817b89}
+.launcher-help,.launcher-shortcuts{margin:0;padding:0 12px 8px;color:#87818e;font:7px/1.7 var(--mono)}
+.launcher-options{display:grid;gap:3px;padding:0 8px 8px}
+.launcher-options button{display:flex;align-items:center;gap:9px;min-width:0;padding:9px 10px;border:1px solid transparent;background:transparent;color:#d8d1df;text-align:left;font:9px var(--mono);cursor:pointer}
+.launcher-options button:hover,.launcher-options button[aria-selected="true"]{border-color:#564660;background:#28212d;color:#fff}
+.launcher-options button small{margin-left:auto;color:#8a8490;font:7px var(--mono)}
+.launcher-option-icon{width:14px;color:var(--orange);text-align:center}
+.launcher-shortcuts{padding:8px 12px;border-top:1px solid #37313d;color:#a29aa9}
+.desktop-dock .desktop-key-hint{flex:1;min-width:100px;white-space:normal;line-height:1.6}
+html[data-theme="light"] .shortcut-search{border-color:#c8beb1;background:#f4f0e9;color:#4d4651}
+html[data-theme="light"] .shortcut-search:hover,html[data-theme="light"] .shortcut-search:focus-visible{border-color:#a95b31;color:#342b36}
+html[data-theme="light"] .window-launcher{border-color:#b9a8c4;background:#f3efe8f7;color:#302a34;box-shadow:0 22px 70px #473b301c,0 0 0 1px #ffffff80}
+html[data-theme="light"] .launcher-heading{border-color:#d7cfc5;color:#704e86}
+html[data-theme="light"] .launcher-heading button{border-color:#d2ccc4;background:#e8e2d9;color:#514b55}
+html[data-theme="light"] .launcher-search-wrap{border-color:#c8beb1;background:#fcfaf5;color:#a95b31}
+html[data-theme="light"] .launcher-search-wrap input{color:#302a34}
+html[data-theme="light"] .launcher-search-wrap input::placeholder,html[data-theme="light"] .launcher-help,html[data-theme="light"] .launcher-options button small{color:#756f78}
+html[data-theme="light"] .launcher-options button{color:#403944}
+html[data-theme="light"] .launcher-options button:hover,html[data-theme="light"] .launcher-options button[aria-selected="true"]{border-color:#c7b5d4;background:#e8e0ed;color:#30243a}
+html[data-theme="light"] .launcher-shortcuts{border-color:#d7cfc5;color:#625b66}
+@media(max-width:700px){.desktop-dock{flex-wrap:wrap}.desktop-dock .desktop-key-hint{display:none}.shortcut-search{margin-inline:auto}.window-launcher{max-height:calc(100% - 20px)}}
 
 @media(max-width:390px){
   .desktop-view{padding-inline:2px}

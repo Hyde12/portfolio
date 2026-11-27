@@ -1,6 +1,7 @@
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const themeToggle = document.querySelector('#theme-toggle');
 const themeColor = document.querySelector('meta[name="theme-color"]');
+themeToggle?.setAttribute('aria-keyshortcuts', ',');
 
 function setTheme(theme, persist = true) {
   const selectedTheme = theme === 'light' ? 'light' : 'dark';
@@ -93,6 +94,8 @@ function mountSharedContent() {
 
 let desktopSpace = 'home';
 let focusedWindow = 'home';
+let desktopLayout = 'overview';
+const paneWidths = { home: 6, terminal: 6, projects: 10, profile: 6, activity: 6, contact: 8 };
 const desktopWindowState = Object.fromEntries(
   [...document.querySelectorAll('.desktop-window')].map((windowNode) => [windowNode.dataset.window, { open: true, minimized: false }])
 );
@@ -101,10 +104,19 @@ function renderDesktop() {
   if (!desktopView) return;
   desktopView.dataset.space = desktopSpace;
   desktopView.dataset.focusWindow = focusedWindow;
+  const desktopCanvas = desktopView.querySelector('.desktop-canvas');
+  if (desktopCanvas) {
+    desktopCanvas.dataset.layout = desktopLayout;
+    desktopCanvas.setAttribute('aria-keyshortcuts', 'ArrowLeft ArrowRight ArrowUp ArrowDown Space Q F , = + -');
+  }
+  applyPaneWidths();
   const windows = [...desktopView.querySelectorAll('.desktop-window')];
   windows.forEach((windowNode, index) => {
     const id = windowNode.dataset.window;
     const state = desktopWindowState[id];
+    windowNode.tabIndex = -1;
+    windowNode.setAttribute('aria-keyshortcuts', 'ArrowLeft ArrowRight ArrowUp ArrowDown Q F');
+    windowNode.querySelector('[data-window-action="close"]')?.setAttribute('aria-keyshortcuts', 'Q');
     const visible = state?.open && !state.minimized && windowNode.dataset.space === desktopSpace;
     windowNode.hidden = !visible;
     windowNode.classList.toggle('focused', id === focusedWindow && visible);
@@ -175,10 +187,172 @@ if (typeof mobileLayoutQuery.addEventListener === 'function') {
 function switchDesktopSpace(space) {
   if (!['home', 'profile', 'contact'].includes(space)) return;
   desktopSpace = space;
-  const firstWindow = [...desktopView.querySelectorAll('.desktop-window')].find((windowNode) => windowNode.dataset.space === space && desktopWindowState[windowNode.dataset.window]?.open);
-  if (firstWindow) focusedWindow = firstWindow.dataset.window;
+  const spaceWindows = [...desktopView.querySelectorAll('.desktop-window')].filter((windowNode) => windowNode.dataset.space === space);
+  const firstWindow = spaceWindows.find((windowNode) => desktopWindowState[windowNode.dataset.window]?.open && !desktopWindowState[windowNode.dataset.window]?.minimized) || spaceWindows[0];
+  if (firstWindow) {
+    desktopWindowState[firstWindow.dataset.window] = { open: true, minimized: false };
+    focusedWindow = firstWindow.dataset.window;
+  }
   renderDesktop();
 }
+
+function applyPaneWidths() {
+  const pairedPanes = [['home', 'terminal'], ['profile', 'activity']];
+  pairedPanes.forEach(([leftId, rightId]) => {
+    const leftWidth = paneWidths[leftId];
+    const left = desktopView?.querySelector(`[data-window="${leftId}"]`);
+    const right = desktopView?.querySelector(`[data-window="${rightId}"]`);
+    if (!left || !right) return;
+    left.style.gridColumn = `1 / ${leftWidth + 1}`;
+    right.style.gridColumn = `${leftWidth + 1} / 13`;
+  });
+  [['projects', 10], ['contact', 8]].forEach(([id, baseWidth]) => {
+    const node = desktopView?.querySelector(`[data-window="${id}"]`);
+    if (!node) return;
+    const width = paneWidths[id];
+    const start = Math.floor((12 - width) / 2) + 1;
+    if (width === baseWidth) node.style.removeProperty('grid-column');
+    else node.style.gridColumn = `${start} / ${start + width}`;
+  });
+}
+
+function availableWindows() {
+  return [...desktopView.querySelectorAll('.desktop-window')].filter((node) =>
+    node.dataset.space === desktopSpace && desktopWindowState[node.dataset.window]?.open && !desktopWindowState[node.dataset.window]?.minimized
+  );
+}
+
+function focusWindow(id, moveFocus = true) {
+  const node = desktopView?.querySelector(`[data-window="${id}"]`);
+  if (!node) return;
+  desktopSpace = node.dataset.space;
+  desktopWindowState[id] = { open: true, minimized: false };
+  focusedWindow = id;
+  renderDesktop();
+  if (moveFocus) node.focus({ preventScroll: true });
+}
+
+function closeWindow(id = focusedWindow) {
+  const node = desktopView?.querySelector(`[data-window="${id}"]`);
+  if (!node || !desktopWindowState[id]?.open) return;
+  desktopWindowState[id] = { open: false, minimized: false };
+  if (focusedWindow === id) {
+    const remaining = availableWindows()[0];
+    if (remaining) focusedWindow = remaining.dataset.window;
+  }
+  renderDesktop();
+  const replacement = desktopView?.querySelector(`[data-window="${focusedWindow}"]`);
+  replacement?.focus({ preventScroll: true });
+}
+
+function moveWindowFocus(direction) {
+  const candidates = availableWindows();
+  if (candidates.length < 2) return;
+  const current = desktopView.querySelector(`[data-window="${focusedWindow}"]`);
+  const currentRect = current?.getBoundingClientRect();
+  const vector = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[direction];
+  if (currentRect && !mobileLayoutQuery.matches && desktopLayout !== 'focus') {
+    const cx = currentRect.left + currentRect.width / 2;
+    const cy = currentRect.top + currentRect.height / 2;
+    const [vx, vy] = vector;
+    const directional = candidates.filter((node) => node !== current).map((node) => {
+      const rect = node.getBoundingClientRect();
+      const dx = rect.left + rect.width / 2 - cx;
+      const dy = rect.top + rect.height / 2 - cy;
+      const primary = dx * vx + dy * vy;
+      const cross = Math.abs(dx * -vy + dy * vx);
+      return { node, primary, cross };
+    }).filter((item) => item.primary > 0).sort((a, b) => a.primary + a.cross * 1.5 - (b.primary + b.cross * 1.5));
+    if (directional.length) {
+      focusWindow(directional[0].node.dataset.window);
+      return;
+    }
+  }
+  const allWindows = [...desktopView.querySelectorAll('.desktop-window')].filter((node) => node.dataset.space === desktopSpace);
+  const currentIndex = allWindows.findIndex((node) => node.dataset.window === focusedWindow);
+  const step = direction === 'ArrowLeft' || direction === 'ArrowUp' ? -1 : 1;
+  for (let offset = 1; offset <= allWindows.length; offset += 1) {
+    const candidate = allWindows[(currentIndex + step * offset + allWindows.length) % allWindows.length];
+    if (desktopWindowState[candidate.dataset.window]?.open && !desktopWindowState[candidate.dataset.window]?.minimized) {
+      focusWindow(candidate.dataset.window);
+      return;
+    }
+  }
+}
+
+function resizeFocusedWindow(delta) {
+  const id = focusedWindow;
+  const pair = { home: 'terminal', terminal: 'home', profile: 'activity', activity: 'profile' };
+  const partner = pair[id];
+  if (partner) {
+    const leftId = id === 'home' || id === 'profile' ? id : partner;
+    const rightId = id === 'terminal' || id === 'activity' ? id : partner;
+    const currentLeft = paneWidths[leftId];
+    const step = (id === leftId ? delta : -delta);
+    const nextLeft = Math.max(3, Math.min(9, currentLeft + step));
+    paneWidths[leftId] = nextLeft;
+    paneWidths[rightId] = 12 - nextLeft;
+  } else if (id === 'projects' || id === 'contact') {
+    paneWidths[id] = Math.max(6, Math.min(12, paneWidths[id] + delta));
+  }
+  applyPaneWidths();
+}
+
+const launcher = desktopView?.querySelector('#window-launcher');
+const launcherInput = desktopView?.querySelector('#window-search');
+const launcherOptions = desktopView?.querySelector('#launcher-options');
+let launcherIndex = 0;
+let launcherReturnFocus = null;
+
+function renderLauncherOptions(query = '') {
+  if (!launcherOptions) return;
+  const normalized = query.trim().toLowerCase();
+  const names = { home: 'about.txt', terminal: 'terminal', projects: 'projects/', profile: 'education.log', activity: 'github activity', contact: 'contact.sh' };
+  const matches = [...desktopView.querySelectorAll('.desktop-window')].filter((node) => `${names[node.dataset.window]} ${node.dataset.window}`.toLowerCase().includes(normalized));
+  launcherIndex = Math.min(launcherIndex, Math.max(matches.length - 1, 0));
+  launcherOptions.replaceChildren(...matches.map((node, index) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.role = 'option';
+    button.dataset.launchWindow = node.dataset.window;
+    button.dataset.launchIndex = String(index);
+    button.setAttribute('aria-selected', String(index === launcherIndex));
+    button.innerHTML = `<span class="launcher-option-icon" aria-hidden="true">${desktopWindowState[node.dataset.window]?.open ? '▣' : '＋'}</span><span>${names[node.dataset.window]}</span><small>${node.dataset.space}</small>`;
+    return button;
+  }));
+  const active = launcherOptions.querySelector(`[data-launch-index="${launcherIndex}"]`);
+  launcherInput?.setAttribute('aria-activedescendant', active ? `launcher-option-${launcherIndex}` : '');
+  launcherOptions.querySelectorAll('[data-launch-index]').forEach((button) => { button.id = `launcher-option-${button.dataset.launchIndex}`; });
+  launcherOptions.setAttribute('aria-label', matches.length ? `${matches.length} matching windows` : 'No matching windows');
+}
+
+function openLauncher() {
+  if (!launcher) return;
+  launcherReturnFocus = document.activeElement;
+  launcher.hidden = false;
+  launcherIndex = 0;
+  if (launcherInput) launcherInput.value = '';
+  renderLauncherOptions();
+  launcherInput?.focus({ preventScroll: true });
+}
+
+function closeLauncher(restoreFocus = true) {
+  if (!launcher || launcher.hidden) return;
+  launcher.hidden = true;
+  if (restoreFocus && launcherReturnFocus instanceof HTMLElement && launcherReturnFocus.isConnected) launcherReturnFocus.focus({ preventScroll: true });
+}
+
+function launchWindow(id) {
+  closeLauncher(false);
+  focusWindow(id);
+}
+
+launcherInput?.addEventListener('input', () => {
+  launcherIndex = 0;
+  renderLauncherOptions(launcherInput.value);
+});
+launcher?.querySelector('[data-close-launcher]')?.addEventListener('click', () => closeLauncher());
+desktopView?.querySelector('[data-open-launcher]')?.addEventListener('click', openLauncher);
 
 document.querySelectorAll('a[href="#work"]').forEach((link) => {
   link.addEventListener('click', () => {
@@ -190,6 +364,11 @@ document.querySelectorAll('a[href="#work"]').forEach((link) => {
 });
 
 desktopView?.addEventListener('click', (event) => {
+  if (launcher && !launcher.hidden && !event.target.closest('.window-launcher')) {
+    event.preventDefault();
+    event.stopPropagation();
+    return;
+  }
   const actionButton = event.target.closest('[data-window-action]');
   const windowNode = event.target.closest('.desktop-window');
   if (actionButton && windowNode) {
@@ -206,14 +385,14 @@ desktopView?.addEventListener('click', (event) => {
 
   const restoreButton = event.target.closest('[data-restore-window]');
   const openButton = event.target.closest('[data-open-window]');
+  const launchButton = event.target.closest('[data-launch-window]');
+  if (launchButton) {
+    launchWindow(launchButton.dataset.launchWindow);
+    return;
+  }
   const id = restoreButton?.dataset.restoreWindow || openButton?.dataset.openWindow;
   if (id) {
-    const target = desktopView.querySelector(`[data-window="${id}"]`);
-    if (!target) return;
-    desktopSpace = target.dataset.space;
-    desktopWindowState[id] = { open: true, minimized: false };
-    focusedWindow = id;
-    renderDesktop();
+    focusWindow(id);
     return;
   }
   if (windowNode) {
@@ -451,9 +630,75 @@ document.addEventListener('visibilitychange', () => {
 startMonitorEffects();
 
 document.addEventListener('keydown', (event) => {
-  if (event.isComposing || event.ctrlKey || event.altKey || event.metaKey || event.shiftKey || (intro && !intro.hidden)) return;
+  if (event.isComposing || event.ctrlKey || event.altKey || event.metaKey) return;
+  if (launcher && !launcher.hidden) {
+    const options = [...(launcherOptions?.querySelectorAll('[data-launch-index]') || [])];
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeLauncher();
+    } else if (event.key === 'Tab') {
+      const focusables = [...launcher.querySelectorAll('button:not([disabled]), input:not([disabled])')];
+      if (event.shiftKey && document.activeElement === focusables[0]) {
+        event.preventDefault();
+        focusables.at(-1)?.focus();
+      } else if (!event.shiftKey && document.activeElement === focusables.at(-1)) {
+        event.preventDefault();
+        focusables[0]?.focus();
+      }
+    } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      if (!options.length) return;
+      event.preventDefault();
+      const direction = event.key === 'ArrowDown' ? 1 : -1;
+      launcherIndex = (launcherIndex + direction + options.length) % options.length;
+      renderLauncherOptions(launcherInput?.value || '');
+    } else if (event.key === 'Enter' && options.length) {
+      event.preventDefault();
+      const selected = launcherOptions.querySelector(`[data-launch-index="${launcherIndex}"]`);
+      if (selected) launchWindow(selected.dataset.launchWindow);
+    }
+    return;
+  }
+  if (intro && !intro.hidden) return;
   const target = event.target;
   if (target?.isContentEditable || target?.matches('input, textarea, select, [role="textbox"]')) return;
+  const key = event.key.toLowerCase();
+  if (event.key.startsWith('Arrow')) {
+    event.preventDefault();
+    moveWindowFocus(event.key);
+    return;
+  }
+  if (key === 'q') {
+    event.preventDefault();
+    closeWindow();
+    return;
+  }
+  if (event.code === 'Space' || event.key === ' ') {
+    event.preventDefault();
+    openLauncher();
+    return;
+  }
+  if (event.key === ',') {
+    event.preventDefault();
+    setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+    return;
+  }
+  if (key === 'f') {
+    event.preventDefault();
+    desktopLayout = desktopLayout === 'focus' ? 'overview' : 'focus';
+    renderDesktop();
+    desktopView?.querySelector(`[data-window="${focusedWindow}"]`)?.focus({ preventScroll: true });
+    return;
+  }
+  if (event.key === '+' || event.key === '=') {
+    event.preventDefault();
+    resizeFocusedWindow(1);
+    return;
+  }
+  if (event.key === '-' || event.key === '_') {
+    event.preventDefault();
+    resizeFocusedWindow(-1);
+    return;
+  }
   const spaceByKey = { '1': 'home', '2': 'profile', '3': 'contact' };
   const space = spaceByKey[event.key];
   if (!space) return;
@@ -601,16 +846,15 @@ async function loadGitHubActivity() {
   const note = document.querySelector('#activity-note');
   const line = chart?.querySelector('.activity-line');
   if (!chart || !note || !line) return;
-  chart.querySelectorAll('.chart-y-labels text').forEach((label, index) => {
-    label.textContent = ['2', '1', '0'][index] || '0';
-  });
 
   try {
-    const response = await fetch('https://api.github.com/users/Hyde12/events/public?per_page=100', {
-      headers: { Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' }
+    const response = await fetch('https://github-contributions-api.jogruber.de/v4/Hyde12?y=last', {
+      headers: { Accept: 'application/json' }
     });
     if (!response.ok) throw new Error('GitHub activity is unavailable');
-    const events = await response.json();
+    const calendar = await response.json();
+    if (!Array.isArray(calendar.contributions)) throw new Error('Contribution calendar is unavailable');
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const days = Array.from({ length: 7 }, (_, index) => {
@@ -618,15 +862,8 @@ async function loadGitHubActivity() {
       date.setDate(today.getDate() - (6 - index));
       return date;
     });
-    const keyFor = (date) => `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-    const counts = new Map(days.map((date) => [keyFor(date), 0]));
-    events.filter((event) => event.type === 'PushEvent').forEach((event) => {
-      const date = new Date(event.created_at);
-      date.setHours(0, 0, 0, 0);
-      const key = keyFor(date);
-      if (counts.has(key)) counts.set(key, counts.get(key) + 1);
-    });
-
+    const keyFor = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    const counts = new Map(calendar.contributions.map(({ date, count }) => [date, Number(count) || 0]));
     const values = days.map((date) => counts.get(keyFor(date)) || 0);
     // Give the graph a readable 0..N scale, even during a quiet week.
     const max = Math.max(2, Math.ceil(Math.max(...values) / 2) * 2);
@@ -642,17 +879,23 @@ async function loadGitHubActivity() {
     chart.querySelectorAll('.activity-points circle').forEach((circle, index) => {
       circle.setAttribute('cx', points[index].x);
       circle.setAttribute('cy', points[index].y);
-      circle.setAttribute('aria-label', `${values[index]} public pushes`);
+      circle.setAttribute('aria-label', `${values[index]} public contributions`);
+      const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+      title.textContent = `${days[index].toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}: ${values[index]} contributions`;
+      circle.replaceChildren(title);
     });
     chart.querySelectorAll('.chart-labels text').forEach((label, index) => {
       label.setAttribute('x', points[index].x);
       label.textContent = days[index].toLocaleDateString(undefined, { weekday: 'short' }).toUpperCase();
     });
-    chart.setAttribute('aria-label', `GitHub public pushes over the past 7 days: ${values.join(', ')}`);
+    chart.dataset.state = 'ready';
+    chart.setAttribute('aria-label', `GitHub public contributions over the past 7 days: ${values.join(', ')}`);
     const total = values.reduce((sum, value) => sum + value, 0);
-    note.textContent = total ? `${total} public push events · last 7 days` : 'No public push events reported · last 7 days';
+    note.textContent = `${total} public contributions · last 7 days`;
   } catch {
-    note.textContent = 'Live activity is temporarily unavailable.';
+    chart.dataset.state = 'unavailable';
+    chart.setAttribute('aria-label', 'GitHub contribution activity is currently unavailable');
+    note.textContent = 'Public contribution data is currently unavailable.';
   }
 }
 
