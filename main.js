@@ -515,19 +515,6 @@ function updateMonitorEffects(timestamp, delta) {
     cursorInside.classList.add('is-visible');
     cursorInside.classList.toggle('is-hovering', hovering);
     const shape = cursorInside.querySelector('.cursor-shape');
-    const trail = cursorInside.querySelector('.cursor-trail');
-    const pixel = cursorInside.querySelector('.cursor-pixel');
-    const pulse = Math.sin(timestamp / 145);
-    if (trail) {
-      trail.style.opacity = `${0.68 + (pulse + 1) * 0.14}`;
-      trail.style.transform = `translate(${pulse * 1.2}px, ${Math.cos(timestamp / 170) * 1.2}px)`;
-      trail.style.setProperty('--trail-before-x', `${Math.cos(timestamp / 120) * 1.5}px`);
-      trail.style.setProperty('--trail-before-y', `${Math.sin(timestamp / 120) * 1.5}px`);
-    }
-    if (pixel) {
-      pixel.style.opacity = `${0.5 + (Math.cos(timestamp / 210) + 1) * 0.22}`;
-      pixel.style.transform = `translate(${Math.sin(timestamp / 180) * 1.4}px, ${Math.cos(timestamp / 180) * 1.4}px)`;
-    }
     if (shape) {
       const clickAge = timestamp - monitorCursorClickAt;
       if (clickAge >= 0 && clickAge < 300) {

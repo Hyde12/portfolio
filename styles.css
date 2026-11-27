@@ -459,7 +459,6 @@ html[data-theme="light"] .pane-bar,html[data-theme="light"] .window-bar{backgrou
 .custom-cursor{position:fixed;left:0;top:0;z-index:120;display:none;align-items:center;justify-content:center;pointer-events:none;opacity:0;transform:translate(-50%,-50%);transition:opacity .12s ease;will-change:left,top;}
 .custom-cursor.is-visible{opacity:1}
 .cursor-shape{display:grid;place-items:center;width:27px;height:27px;border:1px solid #ff9b5a;border-radius:50%;background:#171017bd;color:#ffb27f;font:13px/1 var(--mono);text-shadow:0 0 8px #ff8a3d80;box-shadow:0 0 14px #ff8a3d30;transition:transform .14s,background .14s,border-color .14s;}
-.cursor-inside .cursor-shape{width:24px;height:24px;border-color:#8ed49a;border-radius:2px;background:#0b1710c9;color:#a8f0b3;text-shadow:0 0 8px #8ed49a90;box-shadow:0 0 12px #8ed49a40;}
 .custom-cursor.is-hovering .cursor-shape{transform:scale(1.2);background:#30211c;}
 .cursor-inside.is-hovering .cursor-shape{background:#142719;}
 @media(pointer:fine){body.has-custom-cursor,body.has-custom-cursor *{cursor:none!important}body.has-custom-cursor input,body.has-custom-cursor textarea,body.has-custom-cursor select,body.has-custom-cursor [contenteditable="true"]{cursor:text!important}body.has-custom-cursor .custom-cursor{display:flex}}
@@ -483,19 +482,6 @@ html[data-theme="light"] .pane-bar,html[data-theme="light"] .window-bar{backgrou
 .window-bar{background:#292630;}
 .crt-refresh{position:absolute;inset:0;z-index:22;display:block;width:100%;height:100%;pointer-events:none;}
 
-/* Phosphor pointer: a directional beam with a segmented, animated pixel trail. */
-.cursor-inside .cursor-shape{position:relative;display:block;width:34px;height:38px;border:0;border-radius:0;background:transparent;color:transparent;box-shadow:none;filter:drop-shadow(0 0 5px #8ed49a90);transform-origin:18% 18%;}
-.cursor-core{position:absolute;left:1px;top:0;width:21px;height:27px;clip-path:polygon(0 0,100% 62%,60% 70%,43% 100%,31% 68%);background:linear-gradient(135deg,#efffe9,#a1f1aa 48%,#63cc7a);}
-.cursor-trail{position:absolute;left:14px;top:22px;width:4px;height:4px;background:#adffb7;box-shadow:0 0 8px #8ed49a;animation:phosphor-trail .38s ease-in-out infinite alternate;}
-.cursor-trail::before,.cursor-trail::after{content:"";position:absolute;width:3px;height:3px;background:#7ddd8d;box-shadow:0 0 5px #8ed49a;}
-.cursor-trail::before{left:6px;top:5px;animation:phosphor-trail .28s ease-in-out infinite alternate-reverse;}
-.cursor-trail::after{left:11px;top:10px;width:2px;height:2px;background:#c7ffd0;}
-.cursor-pixel{position:absolute;left:25px;top:28px;width:3px;height:3px;background:#8fe69e;box-shadow:0 0 7px #8ed49a;animation:phosphor-pixel .48s ease-in-out infinite alternate;}
-.cursor-inside.is-hovering .cursor-shape{background:transparent;filter:drop-shadow(0 0 9px #a8ffb7);transform:scale(1.12) rotate(-4deg);}
-@keyframes phosphor-trail{to{opacity:.35;transform:translate(2px,2px)}}
-@keyframes phosphor-pixel{to{opacity:.28;transform:translate(3px,3px)}}
-@media(prefers-reduced-motion:reduce){.cursor-trail,.cursor-trail::before,.cursor-pixel{animation:none!important}}
-
 /* Compact controls live with the desktop session rail. */
 .desktop-rail{min-height:0;align-self:stretch}
 .desktop-rail .settings-heading{margin-top:10px;padding-top:9px;border-top:1px solid #2c2731}
@@ -514,21 +500,16 @@ html[data-theme="light"] .pane-bar,html[data-theme="light"] .window-bar{backgrou
 .window-projects .project-console{transform:none!important;filter:none!important;backface-visibility:visible;transition:border-color .2s ease,box-shadow .2s ease}
 .window-projects .project-console:hover{filter:none!important}
 
-/* The monitor pointer is a small directional phosphor mark. */
-.cursor-inside .cursor-shape{width:24px;height:27px;filter:drop-shadow(0 0 3px #8ed49a80)}
-.cursor-core{width:15px;height:19px}
-.cursor-trail{left:10px;top:16px;width:3px;height:3px}
-.cursor-trail::before{left:4px;top:4px;width:2px;height:2px}
-.cursor-trail::after{left:8px;top:7px;width:2px;height:2px}
-.cursor-pixel{left:17px;top:21px;width:2px;height:2px}
-.cursor-inside.is-hovering .cursor-shape{filter:drop-shadow(0 0 5px #a8ffb780);transform:scale(1.06) rotate(-3deg)}
+/* The dot's center sits exactly at the pointer coordinate. */
+.cursor-inside{transform:translate(-50%,-50%)}
+.cursor-inside .cursor-shape{position:relative;display:block;width:7px;height:7px;border:1px solid #1c7338;border-radius:50%;background:#c8ffd1;color:transparent;box-shadow:0 0 0 1px #eaffec,0 0 9px #8ed49a;filter:none;transform-origin:center}
+.cursor-inside.is-hovering .cursor-shape{background:#eaffec;box-shadow:0 0 0 1px #eaffec,0 0 12px #8ed49a}
 
 /* The monitor controller owns every animated frame inside the screen. */
 .desktop-canvas *,
 .desktop-canvas *::before,
 .desktop-canvas *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
-.cursor-inside,.cursor-inside .cursor-shape,.cursor-trail,.cursor-trail::before,.cursor-pixel{animation:none!important;transition:none!important}
-.cursor-trail::before{transform:translate(var(--trail-before-x,0px),var(--trail-before-y,0px))}
+.cursor-inside,.cursor-inside .cursor-shape{animation:none!important;transition:none!important}
 
 /* Give the portfolio screen a dark workstation setting and a substantial bezel. */
 .desktop-view{isolation:isolate;overflow:visible;border-radius:22px;background:linear-gradient(180deg,#131117 0%,#151319 68%,#1d191a 69%,#111014 100%);box-shadow:inset 0 1px #ffffff08,0 26px 90px #0004}
@@ -785,13 +766,8 @@ html[data-theme="light"] .boot-actions kbd{border-color:#cfc7bc;background:#eee9
 html[data-theme="light"] .boot-footer{border-color:#d4cdc2;background:#e8e2d8;color:#706a73}
 html[data-theme="light"] .boot-footer span:first-child{color:#624887}
 html[data-theme="light"] .cursor-outside .cursor-shape{border-color:#6c3f25;background:#e8dfd2;color:#6c3f25;text-shadow:none;box-shadow:0 0 0 2px #f2eee6,0 2px 8px #35291f50}
-html[data-theme="light"] .cursor-inside .cursor-shape{filter:drop-shadow(0 0 1px #f5f1e9) drop-shadow(0 1px 2px #203b28a0)}
-html[data-theme="light"] .cursor-inside .cursor-core{background:linear-gradient(135deg,#39764b,#164f31 55%,#103d28)}
-html[data-theme="light"] .cursor-inside .cursor-trail,
-html[data-theme="light"] .cursor-inside .cursor-trail::before,
-html[data-theme="light"] .cursor-inside .cursor-trail::after,
-html[data-theme="light"] .cursor-inside .cursor-pixel{background:#1e6138;box-shadow:0 0 0 1px #f5f1e9,0 1px 3px #203b2870}
-html[data-theme="light"] .cursor-inside.is-hovering .cursor-shape{filter:drop-shadow(0 0 1px #f5f1e9) drop-shadow(0 1px 4px #164f31)}
+html[data-theme="light"] .cursor-inside .cursor-shape{border-color:#174e31;background:#237847;box-shadow:0 0 0 1px #f5f1e9,0 0 7px #164f31;filter:none}
+html[data-theme="light"] .cursor-inside.is-hovering .cursor-shape{background:#2f9156;box-shadow:0 0 0 1px #f5f1e9,0 0 10px #164f31}
 html[data-theme="light"] .byte-particle.is-screen{color:#174e30;text-shadow:0 0 3px #f5f1e9}
 
 /* Let each mobile window use the available screen height; the shell fills its pane. */
