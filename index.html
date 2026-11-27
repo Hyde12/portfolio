@@ -52,27 +52,54 @@
   </section>
   <main id="home">
     <div class="desktop-view" id="desktop-view" tabindex="0">
-      <div class="desktop-dock">
-        <div class="desktop-workspaces" role="group" aria-label="Desktop workspaces"><button type="button" class="desktop-workspace active" data-desktop-space="home" aria-keyshortcuts="1" aria-pressed="true">1 <span>HOME</span></button><button type="button" class="desktop-workspace" data-desktop-space="profile" aria-keyshortcuts="2" aria-pressed="false">2 <span>PROFILE</span></button><button type="button" class="desktop-workspace" data-desktop-space="contact" aria-keyshortcuts="3" aria-pressed="false">3 <span>CONTACT</span></button></div>
-        <button class="shortcut-search" type="button" data-open-launcher aria-keyshortcuts="Space" aria-label="Search and open a window (Space)"><kbd>SPACE</kbd><span>SEARCH</span></button>
-        <span class="desktop-key-hint" aria-label="Keyboard shortcuts: Space searches windows, arrow keys focus, Q closes, F toggles full-screen focus, comma changes theme, equals or plus widens, minus narrows">SPACE SEARCH · ARROWS FOCUS · Q CLOSE · F FULLSCREEN · , THEME · =/+ WIDTH</span>
-        <div class="desktop-taskbar" id="desktop-taskbar" aria-label="Open windows"></div>
-        <span class="desktop-clock"><span class="dock-led"></span> HYDE@PORTFOLIO</span>
-      </div>
+      <nav class="desktop-dock mobile-desktop-controls" aria-label="Desktop workspaces">
+        <div class="desktop-workspaces" role="group" aria-label="Desktop workspaces">
+          <button type="button" class="desktop-workspace active" data-desktop-space="home" aria-keyshortcuts="1" aria-pressed="true" aria-label="Workspace 1, Home">1 <span>HOME</span></button>
+          <button type="button" class="desktop-workspace" data-desktop-space="profile" aria-keyshortcuts="2" aria-pressed="false" aria-label="Workspace 2, Profile">2 <span>PROFILE</span></button>
+          <button type="button" class="desktop-workspace" data-desktop-space="contact" aria-keyshortcuts="3" aria-pressed="false" aria-label="Workspace 3, Contact">3 <span>CONTACT</span></button>
+        </div>
+      </nav>
       <div class="desktop-layout">
-        <div class="desktop-canvas" data-desktop-space="home" data-layout="overview" role="region" aria-label="Desktop screen. Use arrow keys to focus windows, Space to search, Q to close, F to focus, comma to change theme, and plus or minus to resize.">
+        <section class="monitor-housing" aria-label="Hyde portfolio monitor">
+          <div class="monitor-brandplate"><span>HYDE / CRT DISPLAY</span><span class="monitor-power"><i></i> POWER</span></div>
+          <div class="desktop-canvas" data-desktop-space="home" data-layout="overview" role="region" aria-label="Desktop screen. Use arrow keys to focus windows, Space to search, Q to close, F to focus, comma to change theme, plus or minus to adjust width, and Shift plus or minus to adjust height.">
           <section class="desktop-window window-home focused" data-window="home" data-space="home"><header class="window-bar"><span>▣ ~/about.txt</span><span class="window-controls"><button type="button" data-window-action="minimize" aria-label="Minimize home window">−</button><button type="button" data-window-action="close" aria-label="Close home window">×</button></span></header><div class="window-content" data-mount="home"></div></section>
           <section class="desktop-window window-terminal" data-window="terminal" data-space="home"><header class="window-bar"><span>▣ zsh — portfolio</span><span class="window-controls"><button type="button" data-window-action="minimize" aria-label="Minimize terminal window">−</button><button type="button" data-window-action="close" aria-label="Close terminal window">×</button></span></header><div class="window-content" data-mount="terminal"></div></section>
           <section class="desktop-window window-projects" data-window="projects" data-space="home"><header class="window-bar"><span>▣ ~/projects/</span><span class="window-controls"><button type="button" data-window-action="minimize" aria-label="Minimize projects window">−</button><button type="button" data-window-action="close" aria-label="Close projects window">×</button></span></header><div class="window-content" data-mount="projects"></div></section>
           <section class="desktop-window window-profile" data-window="profile" data-space="profile"><header class="window-bar"><span>▣ ~/education.log</span><span class="window-controls"><button type="button" data-window-action="minimize" aria-label="Minimize profile window">−</button><button type="button" data-window-action="close" aria-label="Close profile window">×</button></span></header><div class="window-content" data-mount="profile"></div><div class="window-content window-tools" data-mount="tools"></div></section>
           <section class="desktop-window window-activity" data-window="activity" data-space="profile"><header class="window-bar"><span>▣ github --activity</span><span class="window-controls"><button type="button" data-window-action="minimize" aria-label="Minimize activity window">−</button><button type="button" data-window-action="close" aria-label="Close activity window">×</button></span></header><div class="window-content" data-mount="activity"></div></section>
           <section class="desktop-window window-contact" data-window="contact" data-space="contact"><header class="window-bar"><span>▣ ./contact.sh</span><span class="window-controls"><button type="button" data-window-action="minimize" aria-label="Minimize contact window">−</button><button type="button" data-window-action="close" aria-label="Close contact window">×</button></span></header><div class="window-content contact-window-content"><div class="contact-screen"><div class="contact-screen-body"><p class="contact-prompt"><span>hyde@portfolio</span><b>:</b><i>~</i><b>$</b> ./contact.sh</p><span class="contact-label">GET IN TOUCH / 01</span><h2>Have something<br>in <em>mind?</em></h2><p class="contact-intro">Have a project, question, or opportunity in mind? Send me a note.</p><a class="contact-email" href="mailto:zillyhyde.games@gmail.com"><span class="contact-email-icon" aria-hidden="true">@</span><span><strong>Say hello</strong><small>zillyhyde.games@gmail.com</small></span><span class="contact-email-arrow" aria-hidden="true">↗</span></a><div class="contact-links"><a href="mailto:zillyhyde.games@gmail.com">EMAIL <span>↗</span></a><a href="https://github.com/Hyde12" target="_blank" rel="noreferrer">GITHUB <span>↗</span></a></div><div class="contact-status"><span><i></i> AVAILABLE FOR OPPORTUNITIES</span><span>PHILIPPINES · UTC+8</span></div></div></div></div></section>
-          <section class="window-launcher" id="window-launcher" hidden role="dialog" aria-modal="true" aria-labelledby="launcher-title" aria-describedby="launcher-help"><div class="launcher-heading"><span id="launcher-title">OPEN WINDOW</span><button type="button" data-close-launcher aria-label="Close window search">×</button></div><label class="launcher-search-wrap"><span aria-hidden="true">⌕</span><input id="window-search" type="search" placeholder="Search windows…" autocomplete="off" aria-controls="launcher-options" aria-activedescendant=""></label><p class="launcher-help" id="launcher-help">Type to filter · ↑↓ select · Enter open · Esc close</p><div class="launcher-options" id="launcher-options" role="listbox" aria-label="Portfolio windows"></div><p class="launcher-shortcuts">ARROWS focus · Q close · F focus · , theme · +/- width</p></section>
+          <section class="window-launcher" id="window-launcher" hidden role="dialog" aria-modal="true" aria-labelledby="launcher-title" aria-describedby="launcher-help"><div class="launcher-heading"><span id="launcher-title">OPEN WINDOW</span><button type="button" data-close-launcher aria-label="Close window search">×</button></div><label class="launcher-search-wrap"><span aria-hidden="true">⌕</span><input id="window-search" type="search" placeholder="Search windows…" autocomplete="off" aria-controls="launcher-options" aria-activedescendant=""></label><p class="launcher-help" id="launcher-help">Type to filter · ↑↓ select · Enter open · Esc close</p><div class="launcher-options" id="launcher-options" role="listbox" aria-label="Portfolio windows"></div><p class="launcher-shortcuts">ARROWS focus · Q close · F focus · , theme · +/- width · Shift +/- height</p></section>
+          <nav class="hypr-bar" aria-label="Portfolio taskbar">
+            <div class="bar-workspaces" role="group" aria-label="Workspaces">
+              <button type="button" class="desktop-workspace active" data-desktop-space="home" aria-keyshortcuts="1" aria-pressed="true" aria-label="Workspace 1, Home">1<span>HOME</span></button>
+              <button type="button" class="desktop-workspace" data-desktop-space="profile" aria-keyshortcuts="2" aria-pressed="false" aria-label="Workspace 2, Profile">2<span>PROFILE</span></button>
+              <button type="button" class="desktop-workspace" data-desktop-space="contact" aria-keyshortcuts="3" aria-pressed="false" aria-label="Workspace 3, Contact">3<span>CONTACT</span></button>
+            </div>
+            <div class="desktop-taskbar bar-apps" id="desktop-taskbar" role="group" aria-label="Open windows"></div>
+            <div class="bar-tray">
+              <button class="bar-search" type="button" data-open-launcher aria-keyshortcuts="Space" aria-label="Search and open a window, Space"><span aria-hidden="true">⌕</span><kbd>SPACE</kbd></button>
+              <span class="bar-online" aria-label="Portfolio online"><i></i></span>
+              <span class="bar-clock"><time id="desktop-clock">--:--</time><span id="desktop-date">---</span></span>
+            </div>
+            <div class="bar-shortcuts" role="group" aria-label="Keyboard shortcuts">
+              <span><kbd>SPACE</kbd> SEARCH</span><i>·</i><span><kbd>← ↑ ↓ →</kbd> FOCUS</span><i>·</i><span><kbd>Q</kbd> CLOSE</span><i>·</i><span><kbd>F</kbd> FULLSCREEN</span><i>·</i><span><kbd>,</kbd> THEME</span><i>·</i><span><kbd>= / +</kbd> WIDEN</span><i>·</i><span><kbd>−</kbd> NARROW</span><i>·</i><span><kbd>SHIFT +</kbd> TALLER</span><i>·</i><span><kbd>SHIFT −</kbd> SHORTER</span>
+            </div>
+          </nav>
           <canvas class="crt-refresh" id="crt-refresh" aria-hidden="true"></canvas>
-        </div>
+          </div>
+          <div class="monitor-controls" aria-hidden="true"><span class="monitor-vents"></span><span class="monitor-knobs"><i></i><i></i><b>DISPLAY</b></span></div>
+        </section>
         <aside class="desktop-rail" aria-label="Session, windows, and settings"><div class="rail-heading">SESSION <span>3</span></div><div class="session-status"><i></i> hyde-portfolio <small>ACTIVE</small></div><div class="rail-heading">WINDOWS <span>6</span></div><button type="button" data-open-window="home">▤ about.txt</button><button type="button" data-open-window="terminal">▣ terminal</button><button type="button" data-open-window="projects">▸ projects/</button><button type="button" data-open-window="profile">▤ education.log</button><button type="button" data-open-window="activity">▤ activity.json</button><button type="button" data-open-window="contact">▤ contact.sh</button><div class="rail-heading settings-heading">SETTINGS</div><a class="wordmark rail-wordmark" href="#home" aria-label="Zil Hyde Buenaventura, home"><span class="wordmark-mark">Z</span><span>ZIL HYDE<span class="wordmark-dot">.</span></span></a><a class="availability rail-availability" href="mailto:zillyhyde.games@gmail.com"><span class="status-dot"></span> Open to opportunities</a><div class="rail-controls"><button class="replay-intro" id="replay-intro" type="button" aria-label="Replay portfolio intro"><span aria-hidden="true">↻</span><span>INTRO</span></button><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle light theme" aria-pressed="false"><span class="theme-toggle-icon" aria-hidden="true">◐</span><span class="theme-toggle-label">LIGHT</span></button></div><span class="rail-machine"><span>● ONLINE</span><small>LOCAL PORTFOLIO SESSION</small></span></aside>
       </div>
-      <nav class="mobile-pane-dock desktop-mobile-dock" aria-label="Choose window and settings"><button type="button" data-open-window="home">HOME</button><button type="button" data-open-window="terminal">SHELL</button><button type="button" data-open-window="projects">WORK</button><button type="button" data-open-window="profile">ABOUT</button><button type="button" data-open-window="activity">GITHUB</button><button type="button" data-open-window="contact">CONTACT</button></nav>
+      <nav class="mobile-pane-dock desktop-mobile-dock" aria-label="Choose a window and adjust settings">
+        <button type="button" data-open-window="home">HOME</button>
+        <button type="button" data-open-window="terminal">SHELL</button>
+        <button type="button" data-open-window="projects">WORK</button>
+        <button type="button" data-open-window="profile">ABOUT</button>
+        <button type="button" data-open-window="activity">GITHUB</button>
+        <button type="button" data-open-window="contact">CONTACT</button>
+      </nav>
     </div>
 
     <div id="content-bank" hidden>
@@ -90,6 +117,7 @@
           <div class="interactive-terminal-output" id="terminal-output" role="log" aria-live="polite"><div class="terminal-entry"><p><span class="prompt">hyde@portfolio</span><span class="punct">:</span><span class="path">~</span><span class="punct">$</span> cat about.txt</p><pre>Zil Hyde Buenaventura
 Student developer · Philippines
 I build software across different areas, from Rust tools to collaborative projects like Lakad.</pre></div><div class="terminal-entry"><p><span class="prompt">hyde@portfolio</span><span class="punct">:</span><span class="path">~</span><span class="punct">$</span> help</p><pre>help                 show commands
+tree                 show portfolio folders and projects
 ls [directory]      list files
 cd &lt;directory&gt;      change directory
 cat &lt;file&gt;          read a file

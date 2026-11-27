@@ -806,10 +806,6 @@ html[data-theme="light"] .byte-particle.is-screen{color:#174e30;text-shadow:0 0 
 .desktop-canvas[data-layout="focus"] .desktop-window:not(.focused){display:none}
 .desktop-canvas[data-layout="focus"] .desktop-window.focused{grid-column:1/13!important;grid-row:1/11!important;align-self:stretch}
 .desktop-window:focus{outline:2px solid var(--orange);outline-offset:2px}
-.shortcut-search{display:inline-flex;align-items:center;gap:6px;flex:none;min-height:27px;padding:3px 7px;border:1px solid #45404c;border-radius:3px;background:#17141a;color:#c8c2d0;font:7px var(--mono);letter-spacing:.05em;cursor:pointer}
-.shortcut-search:hover,.shortcut-search:focus-visible{border-color:var(--orange);color:#fff}
-.shortcut-search kbd{color:var(--orange);font:inherit}
-@media(min-width:701px){.shortcut-search{display:none}}
 .window-launcher{position:absolute;top:50%;left:50%;z-index:24;width:min(460px,calc(100% - 30px));max-height:calc(100% - 36px);overflow:auto;transform:translate(-50%,-50%);border:1px solid #55445f;border-radius:7px;background:#17141bf5;color:#e8e3ed;box-shadow:0 22px 70px #000b,0 0 0 1px #ffffff10;font-family:var(--mono)}
 .window-launcher[hidden]{display:none!important}
 .launcher-heading{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;border-bottom:1px solid #37313d;color:#bb9bd0;font-size:8px;letter-spacing:.1em}
@@ -825,8 +821,6 @@ html[data-theme="light"] .byte-particle.is-screen{color:#174e30;text-shadow:0 0 
 .launcher-option-icon{width:14px;color:var(--orange);text-align:center}
 .launcher-shortcuts{padding:8px 12px;border-top:1px solid #37313d;color:#a29aa9}
 .desktop-dock .desktop-key-hint{flex:1;min-width:100px;white-space:normal;line-height:1.6}
-html[data-theme="light"] .shortcut-search{border-color:#c8beb1;background:#f4f0e9;color:#4d4651}
-html[data-theme="light"] .shortcut-search:hover,html[data-theme="light"] .shortcut-search:focus-visible{border-color:#a95b31;color:#342b36}
 html[data-theme="light"] .window-launcher{border-color:#b9a8c4;background:#f3efe8f7;color:#302a34;box-shadow:0 22px 70px #473b301c,0 0 0 1px #ffffff80}
 html[data-theme="light"] .launcher-heading{border-color:#d7cfc5;color:#704e86}
 html[data-theme="light"] .launcher-heading button{border-color:#d2ccc4;background:#e8e2d9;color:#514b55}
@@ -836,9 +830,830 @@ html[data-theme="light"] .launcher-search-wrap input::placeholder,html[data-them
 html[data-theme="light"] .launcher-options button{color:#403944}
 html[data-theme="light"] .launcher-options button:hover,html[data-theme="light"] .launcher-options button[aria-selected="true"]{border-color:#c7b5d4;background:#e8e0ed;color:#30243a}
 html[data-theme="light"] .launcher-shortcuts{border-color:#d7cfc5;color:#625b66}
-@media(max-width:700px){.desktop-dock{flex-wrap:wrap}.desktop-dock .desktop-key-hint{display:none}.shortcut-search{margin-inline:auto}.window-launcher{max-height:calc(100% - 20px)}}
+@media(max-width:700px){.desktop-dock{flex-wrap:wrap}.desktop-dock .desktop-key-hint{display:none}.window-launcher{max-height:calc(100% - 20px)}}
 
 @media(max-width:390px){
   .desktop-view{padding-inline:2px}
   .desktop-canvas{padding:1px;border-width:2px;border-bottom-width:6px}
+}
+
+/* Optional desktop-only affordances: keep geometry fixed and the screen content crisp. */
+@media (min-width: 701px) and (hover: hover) and (pointer: fine) {
+  .desktop-dock .desktop-workspace,
+  .desktop-dock .desktop-task,
+  .desktop-rail > button,
+  .desktop-rail a,
+  .window-controls button {
+    transition: color .14s ease, background-color .14s ease, border-color .14s ease, box-shadow .14s ease;
+  }
+  .desktop-workspace:hover,
+  .desktop-workspace:focus-visible {
+    border-color: #55415e;
+    background: #211b26;
+    color: #f0d9ff;
+    box-shadow: inset 0 -2px var(--orange);
+  }
+  .desktop-workspace:hover span,
+  .desktop-workspace:focus-visible span { color: #f0d9ff; }
+  .desktop-task:hover,
+  .desktop-task:focus-visible {
+    border-color: var(--purple);
+    background: #211b27;
+    color: var(--text);
+    box-shadow: inset 0 0 0 1px #b295ff22;
+  }
+  .desktop-rail > button:hover,
+  .desktop-rail > button:focus-visible,
+  .desktop-rail a:hover,
+  .desktop-rail a:focus-visible {
+    border-color: #55415e;
+    background-color: #201b24;
+    color: #f1eaf5;
+    box-shadow: inset 2px 0 var(--orange);
+  }
+  .desktop-window:hover,
+  .desktop-window:focus-visible {
+    border-color: #766080;
+    box-shadow: 0 0 0 1px #b295ff22, 0 16px 38px #0008;
+  }
+  .desktop-window:hover > .window-bar,
+  .desktop-window:focus-visible > .window-bar {
+    color: #f0dcff;
+    background-color: #2a2331;
+  }
+  .window-controls button:hover,
+  .window-controls button:focus-visible {
+    border-color: var(--orange);
+    background-color: #2c211c;
+    color: #ffc092;
+  }
+  .project-option:hover,
+  .project-option:focus-visible {
+    background-color: #211c23;
+    box-shadow: inset 2px 0 var(--orange), inset 0 0 0 1px #ff8a3d22;
+  }
+  .project-option:hover .option-name,
+  .project-option:focus-visible .option-name { color: #fff2e7; }
+  .project-option:hover .option-badge,
+  .project-option:focus-visible .option-badge { border-color: var(--orange); color: #ffb77f; }
+  /* The screen's new hover states are static; monitor visuals remain on the 60 Hz controller. */
+  .desktop-canvas .desktop-window,
+  .desktop-canvas .window-bar,
+  .desktop-canvas .project-option,
+  .desktop-canvas .project-option::after,
+  .desktop-canvas .folder-icon { transition: none; }
+  .desktop-canvas .folder-icon,
+  .desktop-canvas .project-option:hover .folder-icon { transform: none; }
+  html[data-theme="light"] .desktop-workspace:hover,
+  html[data-theme="light"] .desktop-workspace:focus-visible,
+  html[data-theme="light"] .desktop-task:hover,
+  html[data-theme="light"] .desktop-task:focus-visible,
+  html[data-theme="light"] .desktop-rail > button:hover,
+  html[data-theme="light"] .desktop-rail > button:focus-visible,
+  html[data-theme="light"] .desktop-rail a:hover,
+  html[data-theme="light"] .desktop-rail a:focus-visible { color: #30243a; }
+  html[data-theme="light"] .desktop-window:hover,
+  html[data-theme="light"] .desktop-window:focus-visible { border-color: #8e719e; box-shadow: 0 0 0 1px #80609a30, 0 12px 30px #50463920; }
+  html[data-theme="light"] .desktop-window:hover > .window-bar,
+  html[data-theme="light"] .desktop-window:focus-visible > .window-bar { color: #30243a; background-color: #e7deec; }
+  html[data-theme="light"] .project-option:hover,
+  html[data-theme="light"] .project-option:focus-visible { background-color: #e9e0ed; box-shadow: inset 2px 0 #a95b31, inset 0 0 0 1px #a95b3122; }
+  html[data-theme="light"] .project-option:hover .option-name,
+  html[data-theme="light"] .project-option:focus-visible .option-name { color: #30243a; }
+  html[data-theme="light"] .project-option:hover .option-badge,
+  html[data-theme="light"] .project-option:focus-visible .option-badge { border-color: #a95b31; color: #7f3e20; }
+}
+
+/* Monitor-only CRT frame with a Waybar-inspired portfolio taskbar. */
+.desktop-view {
+  width: min(1600px, 100%);
+  min-height: 0;
+  padding: 0 22px 24px;
+  overflow: visible;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.desktop-view::before { display: none; }
+.desktop-layout {
+  grid-template-columns: minmax(0, 1fr) 180px;
+  align-items: start;
+  min-height: 0;
+  padding: 14px 0 20px;
+}
+.monitor-housing {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 15px 16px 10px;
+  border: 1px solid #504a56;
+  border-radius: 24px 24px 31px 31px;
+  background: linear-gradient(145deg, #49434e 0%, #302c34 9%, #242129 50%, #19171d 100%);
+  box-shadow: inset 0 2px 1px #ffffff1a, inset 0 -5px 0 #0d0c10a8, 0 3px 0 #141217, 0 8px 0 #38323d, 0 12px 0 #17151a, 0 30px 58px #0008;
+}
+.monitor-housing::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: 0;
+  border: 1px solid #ffffff0a;
+  border-radius: 19px 19px 26px 26px;
+  box-shadow: 0 0 28px #d47a3b0b;
+  pointer-events: none;
+}
+.monitor-brandplate,
+.monitor-controls {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  color: #aaa2b0;
+  font: 7px/1 var(--mono);
+  letter-spacing: .14em;
+}
+.monitor-brandplate { min-height: 15px; padding: 0 5px 1px; }
+.monitor-power { display: inline-flex; align-items: center; gap: 6px; color: #8dce98; }
+.monitor-power i {
+  width: 6px;
+  height: 6px;
+  border: 1px solid #a2e9ad;
+  border-radius: 50%;
+  background: #71c77e;
+  box-shadow: 0 0 8px #71c77e90, inset 0 1px 1px #e4ffe7;
+}
+.desktop-canvas {
+  min-height: 700px;
+  padding: 12px 12px 78px;
+  border: 9px solid #111015;
+  border-bottom-width: 19px;
+  border-radius: 27px / 20px;
+  background-color: #17151b;
+  background-image: radial-gradient(#5f526b33 .7px, transparent .7px);
+  box-shadow: 0 0 0 1px #5e5663, inset 0 0 28px #0005, 0 9px 20px #100f13cc;
+}
+.desktop-canvas::before,
+.desktop-canvas::after { border-radius: 19px / 13px; }
+.desktop-canvas::before {
+  background: repeating-linear-gradient(to bottom, #f0eaff0a 0 1px, #00000017 1px 4px);
+  opacity: .64;
+}
+.desktop-canvas::after {
+  background: radial-gradient(ellipse at center, transparent 67%, #0000002d 100%), radial-gradient(ellipse 72% 18% at 48% 1%, #ffffff16, transparent 82%), linear-gradient(90deg, #ff8a3d07, transparent 14%, transparent 86%, #a981d808);
+  box-shadow: inset 0 0 0 1px #ffffff1a, inset 0 0 42px 5px #0005;
+}
+.monitor-controls { min-height: 19px; padding: 0 7px; }
+.monitor-vents {
+  width: min(42%, 210px);
+  height: 11px;
+  border-radius: 8px;
+  background: repeating-linear-gradient(to bottom, #0d0c10 0 1px, #4a444e 1px 2px, transparent 2px 4px);
+  box-shadow: inset 0 1px 2px #0008;
+}
+.monitor-knobs { display: inline-flex; align-items: center; gap: 8px; color: #89818e; font-size: 6px; }
+.monitor-knobs i {
+  width: 13px;
+  height: 13px;
+  border: 1px solid #655d69;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #766d7b, #38333d 58%, #17151a 62%);
+  box-shadow: 0 1px 2px #0009, inset 0 1px #ffffff24;
+}
+.monitor-knobs i:first-child { border-color: #8b6048; }
+.monitor-knobs b { margin-left: 2px; font-weight: 400; letter-spacing: .12em; }
+.crt-refresh { z-index: 22; }
+.hypr-bar {
+  position: absolute;
+  z-index: 19;
+  right: 22px;
+  bottom: 13px;
+  left: 22px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 6px;
+  border: 1px solid #6c627466;
+  border-radius: 15px;
+  background: #17151be8;
+  color: #e4dfea;
+  box-shadow: 0 8px 24px #0007, inset 0 1px #ffffff1a;
+  backdrop-filter: blur(16px) saturate(1.25);
+  -webkit-backdrop-filter: blur(16px) saturate(1.25);
+}
+.bar-workspaces,
+.bar-apps,
+.bar-tray { display: flex; align-items: center; min-width: 0; }
+.bar-workspaces {
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid #ffffff0b;
+  border-radius: 10px;
+  background: #0c0b10a8;
+}
+.bar-workspaces .desktop-workspace {
+  justify-content: center;
+  gap: 6px;
+  min-width: 38px;
+  min-height: 30px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: #a39baa;
+  font: 9px var(--mono);
+  transition: color .14s ease, background-color .14s ease, border-color .14s ease, box-shadow .14s ease;
+}
+.bar-workspaces .desktop-workspace span { color: #817987; font-size: 7px; letter-spacing: .04em; }
+.bar-workspaces .desktop-workspace:hover,
+.bar-workspaces .desktop-workspace:focus-visible { border-color: #675275; background: #2b2232; color: #fff; outline: none; }
+.bar-workspaces .desktop-workspace.active {
+  border-color: #745b83;
+  background: linear-gradient(145deg, #3a2d43, #28212d);
+  color: #ffe0c7;
+  box-shadow: inset 0 -2px #ff8a3d, 0 0 12px #a981d820;
+}
+.bar-workspaces .desktop-workspace.active span { color: #d4b8e4; }
+.bar-apps { gap: 4px; overflow-x: auto; scrollbar-width: none; }
+.bar-apps::-webkit-scrollbar { display: none; }
+.desktop-task {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 150px;
+  height: 32px;
+  padding: 0 10px;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #aaa3b0;
+  font: 8px var(--mono);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color .14s ease, background-color .14s ease, border-color .14s ease, box-shadow .14s ease;
+}
+.desktop-task:hover,
+.desktop-task:focus-visible { border-color: #5f4b6b; background: #29232f; color: #f8f2fc; outline: none; }
+.desktop-task.is-focused { border-color: #695378; background: #302739; color: #f5eaff; box-shadow: inset 0 -2px #ff8a3d; }
+.desktop-task.is-minimized { opacity: .58; }
+.desktop-task-icon { flex: 0 0 auto; color: #d2a8ef; font-size: 11px; }
+.desktop-task.is-focused .desktop-task-icon { color: #ffad73; }
+.desktop-task-label { overflow: hidden; text-overflow: ellipsis; }
+.bar-tray { justify-content: flex-end; gap: 8px; }
+.bar-search {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 33px;
+  min-height: 31px;
+  padding: 0 7px;
+  border: 1px solid #ffffff0e;
+  border-radius: 8px;
+  background: #0c0b10a8;
+  color: #bcb3c5;
+  cursor: pointer;
+}
+.bar-search:hover,
+.bar-search:focus-visible { border-color: #c07544; background: #30221f; color: #fff; outline: none; }
+.bar-search>span { color: #ff9d5c; font: 17px/1 var(--mono); }
+.bar-search kbd { color: #8b8291; font: 6px var(--mono); }
+.bar-online { display: grid; place-items: center; width: 16px; height: 24px; }
+.bar-online i { width: 6px; height: 6px; border-radius: 50%; background: #86d593; box-shadow: 0 0 9px #86d59380; }
+.bar-clock { display: grid; justify-items: end; gap: 1px; min-width: 66px; font: 8px/1.2 var(--mono); white-space: nowrap; }
+.bar-clock time { color: #f0eaf5; font-size: 10px; font-variant-numeric: tabular-nums; }
+.bar-clock>span { color: #958d9e; font-size: 6px; text-transform: uppercase; }
+
+html[data-theme="light"] .desktop-view { background: transparent; box-shadow: none; }
+html[data-theme="light"] .monitor-housing {
+  border-color: #a79e93;
+  background: linear-gradient(145deg, #e5dfd6 0%, #d2cbc1 12%, #c3bbb1 57%, #afa79d 100%);
+  box-shadow: inset 0 2px 1px #ffffffaa, inset 0 -5px 0 #827a7080, 0 3px 0 #a59b90, 0 8px 0 #d1c9bf, 0 12px 0 #aaa195, 0 30px 58px #51483d38;
+}
+html[data-theme="light"] .monitor-housing::before { border-color: #ffffff50; box-shadow: 0 0 28px #b95e2d0b; }
+html[data-theme="light"] .monitor-brandplate,
+html[data-theme="light"] .monitor-controls { color: #5d5660; }
+html[data-theme="light"] .monitor-power { color: #3d7048; }
+html[data-theme="light"] .monitor-power i { border-color: #477b50; background: #5a9a64; box-shadow: 0 0 7px #4f8c5c70, inset 0 1px 1px #effff0; }
+html[data-theme="light"] .monitor-vents { background: repeating-linear-gradient(to bottom, #777066 0 1px, #e5ded4 1px 2px, transparent 2px 4px); }
+html[data-theme="light"] .monitor-knobs i { border-color: #8f857b; background: radial-gradient(circle at 35% 30%, #fff9ef, #b9afa3 58%, #82786e 62%); }
+html[data-theme="light"] .monitor-knobs i:first-child { border-color: #a95b31; }
+html[data-theme="light"] .desktop-canvas {
+  border-color: #3b363f;
+  background-color: #e6e2da;
+  background-image: radial-gradient(#85796b24 .7px, transparent .7px);
+  box-shadow: 0 0 0 1px #a69c90, inset 0 0 28px #352d240b, 0 9px 20px #54483a20;
+}
+html[data-theme="light"] .desktop-canvas::before { background: repeating-linear-gradient(to bottom, #51453708 0 1px, #ffffff13 1px 4px); opacity: .55; }
+html[data-theme="light"] .desktop-canvas::after { background: radial-gradient(ellipse at center, transparent 68%, #6d5f4a12 100%), radial-gradient(ellipse 72% 18% at 48% 1%, #ffffff38, transparent 82%), linear-gradient(90deg, #b85d2d08, transparent 14%, transparent 86%, #70559a08); box-shadow: inset 0 0 0 1px #ffffff70, inset 0 0 38px 5px #54483a12; }
+html[data-theme="light"] .hypr-bar {
+  border-color: #bdb1c5cc;
+  background: #f4f0e9eb;
+  color: #352e3a;
+  box-shadow: 0 8px 24px #51483d28, inset 0 1px #ffffffcc;
+}
+html[data-theme="light"] .bar-workspaces { border-color: #d9d1c6; background: #e7e1d8; }
+html[data-theme="light"] .bar-workspaces .desktop-workspace { color: #514958; }
+html[data-theme="light"] .bar-workspaces .desktop-workspace span { color: #716a76; }
+html[data-theme="light"] .bar-workspaces .desktop-workspace:hover,
+html[data-theme="light"] .bar-workspaces .desktop-workspace:focus-visible { border-color: #a38cae; background: #e5ddeb; color: #30243a; }
+html[data-theme="light"] .bar-workspaces .desktop-workspace.active { border-color: #a38cae; background: #e4dbe9; color: #34233f; box-shadow: inset 0 -2px #a95b31; }
+html[data-theme="light"] .bar-workspaces .desktop-workspace.active span { color: #604a70; }
+html[data-theme="light"] .desktop-task { color: #5b5360; }
+html[data-theme="light"] .desktop-task:hover,
+html[data-theme="light"] .desktop-task:focus-visible { border-color: #a88bb8; background: #e9e0ed; color: #30243a; }
+html[data-theme="light"] .desktop-task.is-focused { border-color: #aa91b9; background: #e9dfee; color: #30243a; box-shadow: inset 0 -2px #a95b31; }
+html[data-theme="light"] .desktop-task-icon { color: #77548f; }
+html[data-theme="light"] .desktop-task.is-focused .desktop-task-icon { color: #a34f24; }
+html[data-theme="light"] .bar-search { border-color: #d6cfc5; background: #e7e1d8; color: #514958; }
+html[data-theme="light"] .bar-search:hover,
+html[data-theme="light"] .bar-search:focus-visible { border-color: #a95b31; background: #eee3d9; color: #342b36; }
+html[data-theme="light"] .bar-search kbd,
+html[data-theme="light"] .bar-clock>span { color: #716a76; }
+html[data-theme="light"] .bar-clock time { color: #352e3a; }
+html[data-theme="light"] .bar-online i { background: #4b8656; box-shadow: 0 0 8px #4b865660; }
+
+.desktop-mobile-dock:empty { display: none; }
+@media (max-width: 1000px) {
+  .desktop-layout { grid-template-columns: minmax(0, 1fr) 150px; }
+}
+@media (max-width: 700px) {
+  .desktop-view { width: 100%; min-height: 0; padding: 0 10px 10px; }
+  .desktop-layout { display: block; min-height: 0; padding: 5px 0 8px; }
+  .desktop-rail { display: none !important; }
+  .monitor-housing { gap: 5px; padding: 8px 7px 6px; border-radius: 15px 15px 20px 20px; }
+  .monitor-brandplate { min-height: 12px; padding: 0 3px; font-size: 6px; }
+  .monitor-power { gap: 4px; }
+  .monitor-power i { width: 5px; height: 5px; }
+  .desktop-canvas {
+    display: block;
+    width: 100%;
+    height: clamp(330px, calc(100svh - 220px), 690px);
+    min-height: 330px;
+    padding: 5px 5px 56px;
+    border-width: 6px;
+    border-bottom-width: 13px;
+    border-radius: 13px;
+  }
+  .desktop-canvas::before,
+  .desktop-canvas::after { border-radius: 6px; }
+  .desktop-canvas .desktop-window {
+    position: absolute;
+    inset: 5px 5px 55px;
+    display: none !important;
+    width: auto;
+    height: auto;
+    min-width: 0;
+    min-height: 0;
+    grid-column: auto !important;
+    grid-row: auto !important;
+  }
+  .desktop-canvas .desktop-window.focused { display: flex !important; }
+  .hypr-bar {
+    right: 8px;
+    bottom: 7px;
+    left: 8px;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 4px;
+    min-height: 42px;
+    padding: 4px;
+    border-radius: 12px;
+  }
+  .bar-workspaces { gap: 1px; padding: 2px; border-radius: 8px; }
+  .bar-workspaces .desktop-workspace { min-width: 23px; min-height: 29px; padding: 0 5px; border-radius: 6px; font-size: 8px; }
+  .bar-workspaces .desktop-workspace span { display: none; }
+  .bar-apps { gap: 1px; }
+  .desktop-task { justify-content: center; flex: 0 0 29px; width: 29px; height: 29px; padding: 0; border-radius: 6px; }
+  .desktop-task-label { display: none; }
+  .desktop-task-icon { font-size: 12px; }
+  .bar-tray { gap: 4px; }
+  .bar-search { min-width: 28px; min-height: 29px; padding: 0 5px; border-radius: 6px; }
+  .bar-search kbd { display: none; }
+  .bar-online { width: 9px; }
+  .bar-online i { width: 5px; height: 5px; }
+  .bar-clock { min-width: 39px; }
+  .bar-clock time { font-size: 9px; }
+  .bar-clock>span { display: none; }
+  .monitor-controls { min-height: 12px; padding-inline: 2px; }
+  .monitor-vents { width: 38%; height: 8px; }
+  .monitor-knobs { gap: 5px; font-size: 5px; }
+  .monitor-knobs i { width: 9px; height: 9px; }
+  .desktop-mobile-dock {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
+    margin: 0 10px;
+    padding: 0 0 max(8px, env(safe-area-inset-bottom));
+  }
+  .desktop-mobile-dock .rail-controls { width: min(270px, 100%); justify-self: center; }
+}
+@media (max-width: 390px) {
+  .desktop-view { padding-inline: 5px; }
+  .hypr-bar { right: 6px; left: 6px; gap: 3px; }
+  .bar-workspaces .desktop-workspace { min-width: 21px; padding-inline: 4px; }
+  .desktop-task { flex-basis: 26px; width: 26px; }
+  .bar-online { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bar-workspaces .desktop-workspace,
+  .desktop-task,
+  .bar-search { transition: none !important; }
+}
+
+/* Desktop mode uses the viewport as its frame; phones keep the focused-app layout. */
+.mobile-desktop-controls { display: none; }
+
+@media (min-width: 701px) {
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  #home {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .desktop-view {
+    display: flex;
+    flex-direction: column;
+    width: min(1600px, 100%);
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
+    padding: 10px 22px 13px;
+    overflow: hidden;
+  }
+
+  .desktop-layout {
+    flex: 1 1 auto;
+    grid-template-columns: minmax(0, 1fr) clamp(138px, 13vw, 180px);
+    align-items: stretch;
+    min-height: 0;
+    padding: 8px 0 10px;
+  }
+
+  .monitor-housing {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .desktop-canvas {
+    flex: 1 1 auto;
+    height: 0;
+    min-height: 0;
+    grid-template-rows: repeat(10, minmax(0, 1fr));
+    align-content: stretch;
+    padding-bottom: 104px;
+    background-color: #0e1014;
+    background-image:
+      radial-gradient(ellipse at 16% 15%, #ff8a3d18, transparent 44%),
+      radial-gradient(ellipse at 88% 72%, #a981d818, transparent 46%),
+      linear-gradient(#c8c4d00b 1px, transparent 1px),
+      linear-gradient(90deg, #c8c4d00b 1px, transparent 1px);
+    background-size: auto, auto, 32px 32px, 32px 32px;
+    background-position: center, center, -1px -1px, -1px -1px;
+  }
+
+  .desktop-rail {
+    height: 100%;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .hypr-bar {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-rows: minmax(34px, auto) auto;
+    align-items: center;
+    row-gap: 3px;
+    min-height: 0;
+    padding: 6px 8px 5px;
+  }
+
+  .bar-workspaces { grid-column: 1; grid-row: 1; }
+  .bar-apps { grid-column: 2; grid-row: 1; }
+  .bar-tray { grid-column: 3; grid-row: 1; }
+
+  .bar-shortcuts {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2px 6px;
+    min-width: 0;
+    padding: 5px 2px 1px;
+    border-top: 1px solid #ffffff12;
+    color: #918a98;
+    font: 6px/1.5 var(--mono);
+    letter-spacing: .035em;
+  }
+
+  .bar-shortcuts span { white-space: nowrap; }
+  .bar-shortcuts i { color: #625b68; font-style: normal; }
+  .bar-shortcuts kbd {
+    display: inline-block;
+    padding: 1px 3px;
+    border: 1px solid #554a5d;
+    border-radius: 3px;
+    background: #211d26;
+    color: #d2c8dc;
+    font: 6px/1.3 var(--mono);
+  }
+}
+
+@media (min-width: 701px) and (max-width: 1000px) {
+  .desktop-view { padding-inline: 14px; }
+  .desktop-layout { grid-template-columns: minmax(0, 1fr) 138px; gap: 9px; }
+  .desktop-canvas { padding-right: 8px; padding-left: 8px; padding-bottom: 124px; }
+  .hypr-bar { right: 12px; left: 12px; }
+  .bar-shortcuts { justify-content: flex-start; gap: 2px 5px; font-size: 5.5px; }
+  .bar-shortcuts kbd { font-size: 5.5px; }
+}
+
+@media (max-width: 700px) {
+  html,
+  body {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  #home { height: auto; min-height: 100svh; overflow: visible; }
+  .desktop-view { display: flex; height: auto; max-height: none; overflow: visible; }
+
+  .mobile-desktop-controls {
+    position: relative;
+    top: auto;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 47px;
+    margin: 0 0 5px;
+    padding: 5px;
+    border: 1px solid #393440;
+    border-radius: 8px;
+    background: #111015f2;
+    box-shadow: 0 4px 18px #0003;
+    backdrop-filter: blur(14px);
+  }
+
+  .mobile-desktop-controls .desktop-workspaces {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    flex: 1 1 auto;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .mobile-desktop-controls .desktop-workspace {
+    justify-content: center;
+    min-width: 0;
+    min-height: 34px;
+    padding: 0 4px;
+    border: 1px solid #302b36;
+    border-radius: 4px;
+    background: #17151b;
+    color: #aaa4b1;
+    font-size: 7px;
+    white-space: nowrap;
+  }
+
+  .mobile-desktop-controls .desktop-workspace span { color: inherit; font-size: inherit; }
+  .mobile-desktop-controls .desktop-workspace[aria-pressed="true"] {
+    border-color: #a37bb7;
+    background: #251e2a;
+    color: #f0eaf4;
+    box-shadow: inset 0 -2px var(--orange);
+  }
+
+  .hypr-bar { display: none !important; }
+
+  .desktop-canvas {
+    background-color: #17151b;
+    background-image: radial-gradient(#5f526b33 .7px, transparent .7px);
+    background-size: 18px 18px;
+  }
+
+  .desktop-mobile-dock {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 390px) {
+  .mobile-desktop-controls { gap: 4px; padding: 4px; }
+  .mobile-desktop-controls .desktop-workspaces { gap: 2px; }
+  .mobile-desktop-controls .desktop-workspace { padding-inline: 2px; font-size: 6px; }
+}
+
+html[data-theme="light"] .bar-shortcuts { border-color: #d8cfe0; color: #5d5662; }
+html[data-theme="light"] .bar-shortcuts i { color: #817989; }
+html[data-theme="light"] .bar-shortcuts kbd { border-color: #c9bbd1; background: #e9e1ed; color: #403448; }
+
+@media (min-width: 701px) {
+  html[data-theme="light"] .desktop-canvas {
+    background-color: #0e1014;
+    background-image:
+      radial-gradient(ellipse at 16% 15%, #ff8a3d18, transparent 44%),
+      radial-gradient(ellipse at 88% 72%, #a981d818, transparent 46%),
+      linear-gradient(#c8c4d00b 1px, transparent 1px),
+      linear-gradient(90deg, #c8c4d00b 1px, transparent 1px);
+    background-size: auto, auto, 32px 32px, 32px 32px;
+    background-position: center, center, -1px -1px, -1px -1px;
+  }
+}
+
+@media (max-width: 700px) {
+  html[data-theme="light"] .desktop-canvas {
+    background-color: #ece8e0;
+    background-image: radial-gradient(#988d7d30 .7px, transparent .7px);
+    background-size: 18px 18px;
+  }
+
+  html[data-theme="light"] .mobile-desktop-controls,
+  html[data-theme="light"] .desktop-mobile-dock {
+    border-color: #d2ccc4;
+    background: #f8f6f2f5;
+    box-shadow: 0 4px 18px #54483a18;
+  }
+
+  html[data-theme="light"] .mobile-desktop-controls .desktop-workspace {
+    border-color: #d7d1c9;
+    background: #fffefa;
+    color: #514958;
+  }
+
+  html[data-theme="light"] .mobile-desktop-controls .desktop-workspace[aria-pressed="true"] {
+    border-color: #9b7cb5;
+    background: #eee9f2;
+    color: #392b47;
+  }
+
+}
+
+/* Align the mobile control bars with the screen and keep their buttons inset. */
+@media (max-width: 700px) {
+  .mobile-desktop-controls {
+    width: 100%;
+    margin-inline: 0;
+    border-radius: 0;
+    background: #111015;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .desktop-mobile-dock {
+    width: 100%;
+    margin-inline: 0;
+    padding-inline: 10px;
+    box-sizing: border-box;
+  }
+
+  html[data-theme="light"] .mobile-desktop-controls {
+    background: #f8f6f2;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (max-width: 390px) {
+  .desktop-mobile-dock { padding-inline: 8px; }
+}
+
+/* The desktop taskbar now sits above the windows, with its own clear space. */
+@media (min-width: 701px) {
+  .desktop-canvas {
+    padding-top: 104px;
+    padding-bottom: 12px;
+  }
+
+  .hypr-bar {
+    top: 13px;
+    bottom: auto;
+  }
+}
+
+@media (min-width: 701px) and (max-width: 1000px) {
+  .desktop-canvas {
+    padding-top: 132px;
+    padding-bottom: 8px;
+  }
+}
+
+/* A phone gets a flat, full-width screen; the dimensional CRT case stays desktop-only. */
+@media (max-width: 700px) {
+  .desktop-view {
+    width: 100%;
+    min-height: 100svh;
+    padding: 0 8px max(12px, env(safe-area-inset-bottom));
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .desktop-layout {
+    display: block;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .monitor-housing {
+    display: block;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .monitor-housing::before,
+  .monitor-brandplate,
+  .monitor-controls { display: none !important; }
+
+  .desktop-canvas {
+    display: block;
+    width: 100%;
+    height: clamp(300px, calc(100svh - 250px), 680px);
+    min-height: 300px;
+    margin: 0 0 7px;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #393440;
+    border-radius: 8px;
+    background-color: #17151b;
+    background-image: radial-gradient(#5f526b33 .7px, transparent .7px);
+    background-size: 18px 18px;
+    box-shadow: 0 5px 18px #0003;
+  }
+
+  .desktop-canvas::before,
+  .desktop-canvas::after,
+  .desktop-canvas .crt-refresh { display: none !important; }
+
+  .desktop-canvas .desktop-window {
+    inset: 0 !important;
+    border-radius: 7px;
+  }
+}
+
+/* Light mode uses warm, high-contrast surfaces throughout the screen. */
+@media (min-width: 701px) {
+  html[data-theme="light"] .desktop-canvas {
+    border-color: #c8beb1;
+    background-color: #eeeae2;
+    background-image:
+      radial-gradient(ellipse at 14% 16%, #b85d2d0d, transparent 43%),
+      radial-gradient(ellipse at 88% 72%, #70559a0c, transparent 45%),
+      linear-gradient(#51483a0c 1px, transparent 1px),
+      linear-gradient(90deg, #51483a0c 1px, transparent 1px);
+    background-size: auto, auto, 32px 32px, 32px 32px;
+    background-position: center, center, -1px -1px, -1px -1px;
+    box-shadow: 0 0 0 2px #d4ccc0, 0 0 0 8px #e9e3d9, 0 0 0 10px #c2b8aa, 0 20px 42px #50463920, inset 0 0 22px #54483a0b;
+  }
+
+  html[data-theme="light"] .desktop-canvas::before {
+    background: repeating-linear-gradient(to bottom, #51453706 0 1px, #ffffff12 1px 4px);
+    opacity: .38;
+  }
+
+  html[data-theme="light"] .desktop-canvas::after {
+    background: radial-gradient(ellipse at center, transparent 74%, #6d5f4a0b 100%), radial-gradient(ellipse 72% 18% at 48% 1%, #ffffff35, transparent 82%);
+    box-shadow: inset 0 0 0 1px #ffffff85, inset 0 0 28px 3px #54483a0a;
+  }
+}
+
+@media (max-width: 700px) {
+  html[data-theme="light"] .desktop-view { background: transparent; box-shadow: none; }
+
+  html[data-theme="light"] .desktop-canvas {
+    border-color: #cbc2b7;
+    background-color: #eeeae2;
+    background-image: radial-gradient(#8b7f7024 .7px, transparent .7px);
+    background-size: 18px 18px;
+    box-shadow: 0 4px 14px #54483a16;
+  }
+}
+
+.window-projects .project-console .terminal-titlebar > .terminal-lock {
+  flex: 0 0 auto;
+  margin-left: auto;
 }

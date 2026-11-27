@@ -96,6 +96,9 @@ let desktopSpace = 'home';
 let focusedWindow = 'home';
 let desktopLayout = 'overview';
 const paneWidths = { home: 6, terminal: 6, projects: 10, profile: 6, activity: 6, contact: 8 };
+const paneHeights = { homePair: 4, profilePair: 7, contact: 6 };
+const taskIcons = { home: '◉', terminal: '>_', projects: '▣', profile: '⌂', activity: '⌁', contact: '@' };
+const taskNames = { home: 'HOME', terminal: 'SHELL', projects: 'WORK', profile: 'PROFILE', activity: 'GITHUB', contact: 'CONTACT' };
 const desktopWindowState = Object.fromEntries(
   [...document.querySelectorAll('.desktop-window')].map((windowNode) => [windowNode.dataset.window, { open: true, minimized: false }])
 );
@@ -107,15 +110,16 @@ function renderDesktop() {
   const desktopCanvas = desktopView.querySelector('.desktop-canvas');
   if (desktopCanvas) {
     desktopCanvas.dataset.layout = desktopLayout;
-    desktopCanvas.setAttribute('aria-keyshortcuts', 'ArrowLeft ArrowRight ArrowUp ArrowDown Space Q F , = + -');
+    desktopCanvas.setAttribute('aria-keyshortcuts', 'ArrowLeft ArrowRight ArrowUp ArrowDown Space Q F , = + - Shift+= Shift+-');
   }
   applyPaneWidths();
+  applyPaneHeights();
   const windows = [...desktopView.querySelectorAll('.desktop-window')];
   windows.forEach((windowNode, index) => {
     const id = windowNode.dataset.window;
     const state = desktopWindowState[id];
     windowNode.tabIndex = -1;
-    windowNode.setAttribute('aria-keyshortcuts', 'ArrowLeft ArrowRight ArrowUp ArrowDown Q F');
+    windowNode.setAttribute('aria-keyshortcuts', 'ArrowLeft ArrowRight ArrowUp ArrowDown Q F = + - Shift+= Shift+-');
     windowNode.querySelector('[data-window-action="close"]')?.setAttribute('aria-keyshortcuts', 'Q');
     const visible = state?.open && !state.minimized && windowNode.dataset.space === desktopSpace;
     windowNode.hidden = !visible;
@@ -142,8 +146,16 @@ function renderDesktop() {
     button.className = `desktop-task${desktopWindowState[id].minimized ? ' is-minimized' : ''}${id === focusedWindow ? ' is-focused' : ''}`;
     button.dataset.restoreWindow = id;
     button.setAttribute('aria-label', `Focus or restore ${id} window`);
-    button.setAttribute('aria-pressed', String(id === focusedWindow));
-    button.textContent = id.toUpperCase();
+    button.setAttribute('aria-pressed', String(id === focusedWindow && !desktopWindowState[id].minimized));
+    button.title = taskNames[id];
+    const icon = document.createElement('span');
+    icon.className = 'desktop-task-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    icon.textContent = taskIcons[id];
+    const label = document.createElement('span');
+    label.className = 'desktop-task-label';
+    label.textContent = taskNames[id];
+    button.append(icon, label);
     return button;
   }));
 
@@ -157,6 +169,23 @@ function renderDesktop() {
     button.setAttribute('aria-pressed', String(button.dataset.openWindow === focusedWindow));
   });
 }
+
+const taskbarClock = desktopView?.querySelector('#desktop-clock');
+const taskbarDate = desktopView?.querySelector('#desktop-date');
+let taskbarClockTimer = 0;
+
+function updateTaskbarClock() {
+  if (!taskbarClock || !taskbarDate) return;
+  const now = new Date();
+  taskbarClock.dateTime = now.toISOString();
+  taskbarClock.textContent = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(now);
+  taskbarDate.textContent = new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric' }).format(now);
+  window.clearTimeout(taskbarClockTimer);
+  if (!document.hidden) taskbarClockTimer = window.setTimeout(updateTaskbarClock, 60_000 - (Date.now() % 60_000) + 40);
+}
+
+updateTaskbarClock();
+document.addEventListener('visibilitychange', updateTaskbarClock);
 
 const mobileWindowDock = desktopView?.querySelector('.desktop-mobile-dock');
 const desktopRail = desktopView?.querySelector('.desktop-rail');
@@ -214,6 +243,28 @@ function applyPaneWidths() {
     if (width === baseWidth) node.style.removeProperty('grid-column');
     else node.style.gridColumn = `${start} / ${start + width}`;
   });
+}
+
+function applyPaneHeights() {
+  const setRow = (id, start, end) => {
+    const node = desktopView?.querySelector(`[data-window="${id}"]`);
+    if (node) node.style.gridRow = `${start} / ${end}`;
+  };
+  const upperEnd = paneHeights.homePair + 1;
+  setRow('home', 1, upperEnd);
+  setRow('terminal', 1, upperEnd);
+  setRow('projects', upperEnd, 11);
+
+  const profileEnd = paneHeights.profilePair + 1;
+  setRow('profile', 1, profileEnd);
+  setRow('activity', 1, profileEnd);
+
+  const contactStart = Math.max(1, Math.ceil((10 - paneHeights.contact) / 2));
+  const contact = desktopView?.querySelector('[data-window="contact"]');
+  if (contact) {
+    contact.style.gridRow = `${contactStart} / ${contactStart + paneHeights.contact}`;
+    contact.style.alignSelf = 'stretch';
+  }
 }
 
 function availableWindows() {
@@ -296,6 +347,20 @@ function resizeFocusedWindow(delta) {
     paneWidths[id] = Math.max(6, Math.min(12, paneWidths[id] + delta));
   }
   applyPaneWidths();
+}
+
+function resizeFocusedWindowHeight(delta) {
+  if (mobileLayoutQuery.matches) return;
+  const id = focusedWindow;
+  if (['home', 'terminal', 'projects'].includes(id)) {
+    const direction = id === 'projects' ? -delta : delta;
+    paneHeights.homePair = Math.max(3, Math.min(8, paneHeights.homePair + direction));
+  } else if (id === 'profile' || id === 'activity') {
+    paneHeights.profilePair = Math.max(3, Math.min(10, paneHeights.profilePair + delta));
+  } else if (id === 'contact') {
+    paneHeights.contact = Math.max(3, Math.min(10, paneHeights.contact + delta));
+  }
+  applyPaneHeights();
 }
 
 const launcher = desktopView?.querySelector('#window-launcher');
@@ -676,6 +741,12 @@ document.addEventListener('keydown', (event) => {
     desktopView?.querySelector(`[data-window="${focusedWindow}"]`)?.focus({ preventScroll: true });
     return;
   }
+  if (event.shiftKey && (event.key === '+' || event.key === '_' || event.code === 'Equal' || event.code === 'Minus')) {
+    event.preventDefault();
+    const direction = event.key === '+' || event.code === 'Equal' ? 1 : -1;
+    resizeFocusedWindowHeight(direction);
+    return;
+  }
   if (event.key === '+' || event.key === '=') {
     event.preventDefault();
     resizeFocusedWindow(1);
@@ -951,6 +1022,24 @@ function projectReadme(option) {
   return [`# ${option.dataset.project}`, '', option.dataset.summary, '', '## Highlights', ...option.dataset.highlights.split('|').map((line) => `  • ${line}`), '', `## Built with\n${option.dataset.stack}`, '', `## Run\n${option.dataset.command}`].join('\n');
 }
 
+function portfolioTree() {
+  const projects = projectOptions.map((option) => option.dataset.folder);
+  const rootEntries = ['about.txt', 'contact.txt', 'README.md', 'projects/'];
+  const lines = ['.'];
+  rootEntries.forEach((entry, index) => {
+    const last = index === rootEntries.length - 1;
+    lines.push(`${last ? '└──' : '├──'} ${entry}`);
+    if (entry !== 'projects/') return;
+    projects.forEach((folder, projectIndex) => {
+      const lastProject = projectIndex === projects.length - 1;
+      const branch = lastProject ? '└──' : '├──';
+      lines.push(`    ${branch} ${folder}/`);
+      lines.push(`    ${lastProject ? '    ' : '│   '}└── README.md`);
+    });
+  });
+  return lines.join('\n');
+}
+
 function runTerminalCommand(rawCommand, printPrompt = true) {
   const command = rawCommand.trim();
   if (!command) return;
@@ -963,7 +1052,9 @@ function runTerminalCommand(rawCommand, printPrompt = true) {
   if (normalized === 'clear') {
     terminalOutput.replaceChildren();
   } else if (normalized === 'help') {
-    output = 'help                 show available commands\nls [directory]       list files and directories\npwd                  print current directory\ncd <directory>       change directory\ncat <file>           read a project or portfolio file\nwhoami               about Hyde\nclear                clear the screen';
+    output = 'help                 show available commands\ntree                 show portfolio folders and projects\nls [directory]       list files and directories\npwd                  print current directory\ncd <directory>       change directory\ncat <file>           read a project or portfolio file\nwhoami               about Hyde\nclear                clear the screen';
+  } else if (normalized === 'tree') {
+    output = portfolioTree();
   } else if (normalized === 'whoami') {
     output = 'Zil Hyde Buenaventura\nStudent developer · Philippines\nI build across different areas, from Rust tools to collaborative projects like Lakad.';
   } else if ((normalized === 'cargo' && args[0] === 'run') || (normalized === 'npm' && args[0] === 'run') || (normalized === 'python' && args[0] === 'app.py')) {
